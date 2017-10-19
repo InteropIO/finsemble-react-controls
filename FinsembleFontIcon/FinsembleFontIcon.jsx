@@ -4,8 +4,6 @@
 */
 
 const React = require('react');
-//@todo, make sure that finFont makes it over to the controls repo. Or point to a hosted file.
-require('../../../../../assets/css/finfont.css');
 
 class FinsembleFontIcon extends React.Component {
     constructor(props) {
