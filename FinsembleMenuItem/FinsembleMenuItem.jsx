@@ -94,7 +94,9 @@ class FinsembleMenuItem extends React.Component {
         return (<div className={classes}>
             {label}
             {actions}
-            {this.props.children}
+            {/*Only render the children if the label is defined. Otherwise we take the label and transform them into the label.*/}
+            {!this.props.label &&
+                this.props.children}
         </div>);
     }
 }
