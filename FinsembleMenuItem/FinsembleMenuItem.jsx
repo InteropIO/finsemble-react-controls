@@ -40,7 +40,7 @@ class FinsembleMenuItem extends React.Component {
         let classes = this.props.className || BUTTON_BASE_CLASS;
         if (classes !== BUTTON_BASE_CLASS) {
             //If you're unfamiliar with this syntax, it's equivalent to
-		    //classes+=' ' + BUTTON_BASE_CLASS;
+            //classes+=' ' + BUTTON_BASE_CLASS;
             classes += ` ${BUTTON_BASE_CLASS}`;
         }
 
@@ -78,8 +78,17 @@ class FinsembleMenuItem extends React.Component {
                     menuItemProps={this.props}
                     onClick={this.props.onClick || this.props.onLabelClick}
                     className="menu-item-label-fullwidth"
-                    label={this.props.label}/>
-                );
+                    label={this.props.label} />
+            );
+        } else {
+            label = (
+                <FinsembleMenuItemLabel
+                    menuItemProps={this.props}
+                    onClick={this.props.onClick || this.props.onLabelClick}
+                    className="menu-item-label-fullwidth">
+                    {this.props.children}
+                </FinsembleMenuItemLabel>
+            )
         }
 
         return (<div className={classes}>
