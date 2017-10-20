@@ -80,23 +80,13 @@ class FinsembleMenuItem extends React.Component {
                     className="menu-item-label-fullwidth"
                     label={this.props.label} />
             );
-        } else {
-            label = (
-                <FinsembleMenuItemLabel
-                    menuItemProps={this.props}
-                    onClick={this.props.onClick || this.props.onLabelClick}
-                    className="menu-item-label-fullwidth">
-                    {this.props.children}
-                </FinsembleMenuItemLabel>
-            )
         }
 
         return (<div className={classes}>
             {label}
             {actions}
             {/*Only render the children if the label is defined. Otherwise we take the label and transform them into the label.*/}
-            {this.props.label &&
-                this.props.children}
+            {this.props.children}
         </div>);
     }
 }
