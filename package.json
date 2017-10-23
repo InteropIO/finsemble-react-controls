@@ -1,0 +1,23 @@
+{
+  "name": "@chartiq/finsemble-react-controls",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChartIQ/finsemble-react-controls.git"
+  },
+  "author": "chartiq <finsemble@chartiq.com> (finsemble.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChartIQ/finsemble-react-controls/issues"
+  },
+  "homepage": "https://github.com/ChartIQ/finsemble-react-controls#readme",
+  "dependencies": {
+    "react": "^15.3.2"
+  }
+}
