@@ -50,8 +50,8 @@ module.exports = {
 		]
 	},
 	output: {
-		filename: '[name].js',
-		sourceMapFilename: '[file].map'
+		filename: './dist/index.js',
+		sourceMapFilename: './dist/index.js.map'
 	},
 	resolve: {
 		extensions: ['.js', '.jsx', '.json', 'scss']
