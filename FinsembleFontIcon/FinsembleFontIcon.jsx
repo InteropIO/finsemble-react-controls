@@ -3,9 +3,9 @@
 * All rights reserved.
 */
 
-const React = require('react');
+import React from 'react';
 
-class FinsembleFontIcon extends React.Component {
+export default class FinsembleFontIcon extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -23,4 +23,3 @@ class FinsembleFontIcon extends React.Component {
         return (<i {...this.props} className={classes}></i>);
     }
 }
-module.exports = FinsembleFontIcon;

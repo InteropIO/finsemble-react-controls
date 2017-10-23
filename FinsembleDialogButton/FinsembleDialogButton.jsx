@@ -4,9 +4,10 @@
 */
 
 const BUTTON_BASE_CLASS = 'fsbl-button';
-const React = require('react');
-var FinsembleButton = require('../FinsembleButton/FinsembleButton');
-class FinsembleDialogButton extends React.Component {
+import React from 'react';
+import FinsembleButton from '../FinsembleButton/FinsembleButton';
+
+export default class FinsembleDialogButton extends React.Component {
 	constructor(props) {
 		super(props);
 	}
@@ -21,4 +22,3 @@ class FinsembleDialogButton extends React.Component {
 		</FinsembleButton>)
 	}
 }
-module.exports = FinsembleDialogButton;

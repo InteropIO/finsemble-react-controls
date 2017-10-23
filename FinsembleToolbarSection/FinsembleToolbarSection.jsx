@@ -16,9 +16,10 @@
  *
  */
 
-let React = require('react');
-const SECTION_BASE_CLASS = 'finsemble-toolbar-section'
-class FinsembleToolbarSection extends React.Component {
+import React from 'react';
+const SECTION_BASE_CLASS = 'finsemble-toolbar-section';
+
+export default class FinsembleToolbarSection extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
@@ -144,5 +145,3 @@ class FinsembleToolbarSection extends React.Component {
         </div>)
     }
 }
-
-module.exports = FinsembleToolbarSection;

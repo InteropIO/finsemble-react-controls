@@ -2,13 +2,12 @@
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
-const React = require('react');
+import React from 'react';
+import FinsembleMenu from '../FinsembleMenu/FinsembleMenu';
+import FinsembleMenuItem from '../FinsembleMenuItem/FinsembleMenuItem';
+import FinsembleMenuSection from '../FinsembleMenuSection/FinsembleMenuSection';
 
-const FinsembleMenu = require('../FinsembleMenu/FinsembleMenu');
-const FinsembleMenuItem = require('../FinsembleMenuItem/FinsembleMenuItem');
-const FinsembleMenuSection = require('../FinsembleMenuSection/FinsembleMenuSection');
-
-class FinsembleOverflowMenu extends React.Component {
+export default class FinsembleOverflowMenu extends React.Component {
 	constructor(props) {
 		// Build a store for overflow
 		super(props);
@@ -77,4 +76,3 @@ class FinsembleOverflowMenu extends React.Component {
 	}
 }
 
-module.exports = FinsembleOverflowMenu;

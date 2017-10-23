@@ -2,10 +2,10 @@
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
-
+import React from 'react';
 const DIALOG_QUESTION_BASE_CLASS = 'dialog-question';
-const React = require('react');
-class FinsembleDialogQuestion extends React.Component {
+
+export default class FinsembleDialogQuestion extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -21,4 +21,3 @@ class FinsembleDialogQuestion extends React.Component {
         </div>)
     }
 }
-module.exports = FinsembleDialogQuestion;

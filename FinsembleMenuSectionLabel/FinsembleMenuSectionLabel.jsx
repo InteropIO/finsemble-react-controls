@@ -2,9 +2,9 @@
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
-const React = require('react');
+import React from 'react';
 
-class FinsembleMenuSectionLabel extends React.Component {
+export default class FinsembleMenuSectionLabel extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -15,4 +15,3 @@ class FinsembleMenuSectionLabel extends React.Component {
         </div>)
     }
 }
-module.exports = FinsembleMenuSectionLabel;

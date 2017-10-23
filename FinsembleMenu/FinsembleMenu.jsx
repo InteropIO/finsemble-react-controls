@@ -2,7 +2,7 @@
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
-let React = require('react');
+import React from 'react';
 const MENU_BASE_CLASS = 'menu';
 /**
  * Little helper just to set some defaults if the user passes in undefined values.
@@ -26,7 +26,7 @@ function Padding(pad) {
     return padding;
 }
 
-class FinsembleMenu extends React.Component {
+export default class FinsembleMenu extends React.Component {
     //Sets up the menu, adding listeners and necessary CSS Classes.
     constructor(props) {
         super(props);
@@ -191,5 +191,3 @@ class FinsembleMenu extends React.Component {
         </div>);
     }
 }
-
-module.exports = FinsembleMenu;

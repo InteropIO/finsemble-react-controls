@@ -7,9 +7,10 @@
  * A Button Consists of a Title and/or an Icon and a tooltip.
  */
 
-const React = require('react');
-const FontIcon = require('../FinsembleFontIcon/FinsembleFontIcon');
-const ButtonLabel = require('../FinsembleButtonLabel/FinsembleButtonLabel');
+import React from 'react';
+import FontIcon from '../FinsembleFontIcon/FinsembleFontIcon';
+import ButtonLabel from '../FinsembleButtonLabel/FinsembleButtonLabel';
+
 //Default to giving every button a pointer cursor.
 const styles = {
 	cursor: 'pointer'
@@ -48,7 +49,7 @@ function BoundingBoxRelativeToWindow(domElementClientRect) {
  * @class Button
  * @extends {React.Component}
 * */
-class Button extends React.Component {
+export default class Button extends React.Component {
 	constructor(props) {
 		super(props);
 		//Necessary to bind the correct _this_ to methods on the class.
@@ -253,4 +254,3 @@ class Button extends React.Component {
 		</div>)
 	}
 }
-module.exports = Button;

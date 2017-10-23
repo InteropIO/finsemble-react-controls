@@ -4,10 +4,10 @@
 * All rights reserved.
 */
 
-const React = require('react');
+import React from 'react';
 const DIALOG_INPUT_BASE_CLASS = 'dialog-input';
 
-class FinsembleDialogTextInput extends React.Component {
+export default class FinsembleDialogTextInput extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -25,4 +25,3 @@ class FinsembleDialogTextInput extends React.Component {
         </div>)
     }
 }
-module.exports = FinsembleDialogTextInput;

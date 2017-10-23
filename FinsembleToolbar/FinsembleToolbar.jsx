@@ -8,9 +8,10 @@
  * This is a container for toolbar sections
  */
 
-let React = require('react');
-const TOOLBAR_BASE_CLASS = 'finsemble-toolbar'
-class FinsembleToolbar extends React.Component {
+import React from 'react';
+const TOOLBAR_BASE_CLASS = 'finsemble-toolbar';
+
+export default class FinsembleToolbar extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
@@ -25,5 +26,3 @@ class FinsembleToolbar extends React.Component {
         </div>)
     }
 }
-
-module.exports = FinsembleToolbar;

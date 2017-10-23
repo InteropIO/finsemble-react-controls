@@ -3,9 +3,9 @@
 * All rights reserved.
 */
 
-let React = require('react');
+import React from 'react';
 const DIALOG_BASE_CLASS = 'dialog'
-class FinsembleDialog extends React.Component {
+export default class FinsembleDialog extends React.Component {
 	constructor(props) {
 		super(props);
 		this.props = props;
@@ -96,6 +96,4 @@ class FinsembleDialog extends React.Component {
 			{this.props.children}
 		</div>)
 	}
-}
-
-module.exports = FinsembleDialog;
+};

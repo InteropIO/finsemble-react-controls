@@ -1,15 +1,16 @@
-const React = require('react');
+import React from 'react';
+import FinsembleMenuItemLabel from '../FinsembleMenuItemLabel/FinsembleMenuItemLabel';
+import FinsembleMenuItemActions from '../FinsembleMenuItemActions/FinsembleMenuItemActions';
+import FinsembleMenuItemAction  from '../FinsembleMenuItemAction/FinsembleMenuItemAction';
+import FontIcon from '../FinsembleFontIcon/FinsembleFontIcon';
 
 const BUTTON_BASE_CLASS = 'menu-item';
-const FinsembleMenuItemLabel = require('../FinsembleMenuItemLabel/FinsembleMenuItemLabel');
-const FinsembleMenuItemActions = require('../FinsembleMenuItemActions/FinsembleMenuItemActions');
-const FinsembleMenuItemAction = require('../FinsembleMenuItemAction/FinsembleMenuItemAction');
+
 /*!
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
-const FontIcon = require('../FinsembleFontIcon/FinsembleFontIcon');
-class FinsembleMenuItem extends React.Component {
+export default class FinsembleMenuItem extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -90,4 +91,3 @@ class FinsembleMenuItem extends React.Component {
         </div>);
     }
 }
-module.exports = FinsembleMenuItem;

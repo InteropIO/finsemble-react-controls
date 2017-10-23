@@ -3,9 +3,10 @@
 * All rights reserved.
 */
 
-const React = require('react');
+import React from 'react';
 const SECTION_BASE_CLASS = 'menu-section';
-class FinsembleMenuSection extends React.Component {
+
+export default class FinsembleMenuSection extends React.Component {
 	constructor(props) {
 		super(props);
 		this.props = props;
@@ -80,4 +81,3 @@ class FinsembleMenuSection extends React.Component {
 
 	}
 }
-module.exports = FinsembleMenuSection;

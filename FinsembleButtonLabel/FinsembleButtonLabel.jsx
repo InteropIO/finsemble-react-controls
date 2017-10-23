@@ -2,9 +2,9 @@
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
-const React = require('react');
+import React from 'react';
 const BUTTON_BASE_CLASS = 'finsemble-toolbar-button-label';
-class FinsembleButtonLabel extends React.Component {
+export default class FinsembleButtonLabel extends React.Component {
 	constructor(props) {
 		super(props);
 	}
@@ -22,4 +22,3 @@ class FinsembleButtonLabel extends React.Component {
 		return (<div className={classes}>{this.props.label}</div>)
 	}
 }
-module.exports = FinsembleButtonLabel;

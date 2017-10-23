@@ -2,11 +2,12 @@
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
+import React from 'react';
+import FinsembleButton from '../FinsembleButton/FinsembleButton';
 
 const BUTTON_BASE_CLASS = 'menu-item-action';
-const React = require('react');
-var FinsembleButton = require('../FinsembleButton/FinsembleButton');
-class FinsembleMenuItemActions extends React.Component {
+
+export default class FinsembleMenuItemAction extends React.Component {
 	constructor(props) {
 		super(props);
 	}
@@ -22,4 +23,3 @@ class FinsembleMenuItemActions extends React.Component {
 		</FinsembleButton>)
 	}
 }
-module.exports = FinsembleMenuItemActions;
