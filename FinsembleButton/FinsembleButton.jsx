@@ -22,7 +22,7 @@ const classMap = {
 	MenuItemActions: 'menu-item-actions',
 	Toolbar: 'finsemble-toolbar-button',
 	Dialog: 'fsbl-button'
-}
+};
 /**
  * Used for menuLauncher buttons. This gets us the position relative to the current monitor, so we know where where the user can click and cause a blur. If the user clicks outside of the button's bounding box, we blur the menu. A subsequent click will open the menu. If the user clicks the button to open the menu, then clicks the button again, we blur the menu, and the next click will not open the menu. This prevents a spastic, blinking menu when the user clicks it twice.
  *
@@ -111,11 +111,11 @@ export default class Button extends React.Component {
 		let self = this;
 		//Params for the dialogManager.
 		let params = {
-			monitor: "mine",
-			position: "relative",
+			monitor: 'mine',
+			position: 'relative',
 			left: e.currentTarget.getBoundingClientRect().left,
 			forceOntoMonitor: true,
-			top: "adjacent",
+			top: 'adjacent',
 			spawnIfNotFound: true
 		};
 		//gets the parent button wrapper.
@@ -132,7 +132,7 @@ export default class Button extends React.Component {
 				var onMenuBlurred = function (blurErr, blurResponse) {
 					//On blur, check the mouse position. If click was inside of the button, we invalidate the click event that will be coming soon.
 					let clientRect = DOM.getBoundingClientRect();
-					let boundingBox = new BoundingBoxRelativeToWindow(clientRect)
+					let boundingBox = new BoundingBoxRelativeToWindow(clientRect);
 					//Assumption is that the blur happened elsewhere. If the blur happened on the button, we don't want to open the menu on click.
 					let openMenuOnClick = true;
 					fin.desktop.System.getMousePosition((position) => {
@@ -141,7 +141,7 @@ export default class Button extends React.Component {
 							openMenuOnClick = false;
 						}
 
-						self.openMenuOnClick = openMenuOnClick
+						self.openMenuOnClick = openMenuOnClick;
 					});
 					finWindow.removeEventListener('blurred', onMenuBlurred);
 				};
@@ -187,7 +187,7 @@ export default class Button extends React.Component {
 		let self = this,
 			image = null,
 			label = null,
-			iconPosition = this.props.iconPosition || "left",
+			iconPosition = this.props.iconPosition || 'left',
 			iconClasses = this.props.iconClasses || '',
 			classes = this.props.className || '',
 			types = this.props.buttonType || [];
@@ -234,7 +234,7 @@ export default class Button extends React.Component {
 				this._onClick = this.launchComponent;
 			}
 		} else {
-			this.warn("No type property passed to button.");
+			this.warn('No type property passed to button.');
 		}
 
 		//Wrapper to allow for beforeClick and AfterClick
@@ -242,7 +242,7 @@ export default class Button extends React.Component {
 			if (self.props.beforeClick) self.props.beforeClick(e);
 			if (self._onClick) self._onClick(e);
 			if (self.props.afterClick) self.props.afterClick(e);
-		}
+		};
 
 		return (<div onMouseUp={this.props.onMouseUp}
 			onMouseDown={this.props.onMouseDown}
@@ -251,6 +251,6 @@ export default class Button extends React.Component {
 			{image}
 			{label}
 			{this.props.children}
-		</div>)
+		</div>);
 	}
 }

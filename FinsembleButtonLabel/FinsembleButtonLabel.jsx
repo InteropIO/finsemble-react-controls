@@ -19,6 +19,6 @@ export default class FinsembleButtonLabel extends React.Component {
 		let labelClass = alignClassMap[align];
 
 		classes += ` ${BUTTON_BASE_CLASS} ${labelClass}`;
-		return (<div className={classes}>{this.props.label}</div>)
+		return (<div className={classes}>{this.props.label}</div>);
 	}
 }

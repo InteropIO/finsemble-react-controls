@@ -15,11 +15,11 @@ export default class FinsembleToolbarSeparator extends React.Component {
 	constructor(props) {
 		super(props);
 	}
-    render() {
-        let classes = this.props.className || '';
+	render() {
+		let classes = this.props.className || '';
 		classes += ` ${BUTTON_BASE_CLASS}`;
-        return (<div {...this.props} className={classes}>
+		return (<div {...this.props} className={classes}>
 			{this.props.children}
-		</div>)
+		</div>);
 	}
 }

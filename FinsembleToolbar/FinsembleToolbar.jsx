@@ -12,17 +12,17 @@ import React from 'react';
 const TOOLBAR_BASE_CLASS = 'finsemble-toolbar';
 
 export default class FinsembleToolbar extends React.Component {
-    constructor(props) {
-        super(props);
-        this.props = props;
+	constructor(props) {
+		super(props);
+		this.props = props;
 	}
 
-    render() {
-        let classes = this.props.className || '';
+	render() {
+		let classes = this.props.className || '';
 		classes += ` ${TOOLBAR_BASE_CLASS}`;
 
-        return (<div className={classes}>
-            {this.props.children}
-        </div>)
-    }
+		return (<div className={classes}>
+			{this.props.children}
+		</div>);
+	}
 }

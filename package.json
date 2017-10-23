@@ -2,10 +2,13 @@
   "name": "@chartiq/finsemble-react-controls",
   "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postversion": "git push && git push --tags"
+    "version": "webpack --config=./webpack.config.js",
+    "postversion": "git push && git push --tags",
+    "build": "webpack --config=./webpack.config.js",
+    "lint": "eslint ./**/*.jsx --fix"
   },
   "repository": {
     "type": "git",
@@ -29,5 +32,10 @@
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
     "babel-preset-stage-1": "^6.16.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.9.0",
+    "eslint-plugin-react": "^7.4.0",
+    "webpack": "^3.8.1"
   }
 }

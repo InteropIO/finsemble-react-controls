@@ -4,7 +4,7 @@
 */
 
 import React from 'react';
-const DIALOG_BASE_CLASS = 'dialog'
+const DIALOG_BASE_CLASS = 'dialog';
 export default class FinsembleDialog extends React.Component {
 	constructor(props) {
 		super(props);
@@ -28,7 +28,7 @@ export default class FinsembleDialog extends React.Component {
 
 		this.addResponder();
 
-		document.body.addEventListener('keydown', this.handleKeyDown)
+		document.body.addEventListener('keydown', this.handleKeyDown);
 		document.body.className += ' dialog';
 	}
 	/**
@@ -91,9 +91,9 @@ export default class FinsembleDialog extends React.Component {
 
 	render() {
 		let classes = this.props.className;
-		classes += ` ${DIALOG_BASE_CLASS}`
+		classes += ` ${DIALOG_BASE_CLASS}`;
 		return (<div className={classes}>
 			{this.props.children}
-		</div>)
+		</div>);
 	}
-};
+}

@@ -10,9 +10,9 @@ export default class FinsembleMenuItemLabel extends React.Component {
 	constructor(props) {
 		super(props);
 	}
-    render() {
-        return (<FinsembleButton buttonType="MenuItemLabel" {...this.props}>
+	render() {
+		return (<FinsembleButton buttonType="MenuItemLabel" {...this.props}>
 			{this.props.children}
-		</FinsembleButton>)
+		</FinsembleButton>);
 	}
 }

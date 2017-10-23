@@ -14,7 +14,7 @@ export default class FinsembleOverflowMenu extends React.Component {
 		var self = this;
 		self.state = {
 			buttons: []
-		}
+		};
 		this.onStateChange = props.onStateChange || function noop() { };
 		this.buttonChangeListener = this.buttonChangeListener.bind(this);
 		this.clickChannelListner = this.clickChannelListner.bind(this);
@@ -41,10 +41,10 @@ export default class FinsembleOverflowMenu extends React.Component {
 
 			});
 
-			store.addListener({ field: 'buttons' }, self.buttonChangeListener)
+			store.addListener({ field: 'buttons' }, self.buttonChangeListener);
 
-			store.addListener({ field: 'clickChannel' }, self.clickChannelListner)
-		})
+			store.addListener({ field: 'clickChannel' }, self.clickChannelListner);
+		});
 	}
 
 	componentDidUpdate() {
@@ -68,11 +68,11 @@ export default class FinsembleOverflowMenu extends React.Component {
 
 		return <FinsembleMenu>
 			<FinsembleMenuSection className='menu-primary'>
-			{this.state.buttons.map((button) => {
-				return <FinsembleMenuItem clickChannel={self.state.clickChannel} {...button.item} key={button.index} clickIndex={button.index} onClick={self.onClick} />
-			})}
+				{this.state.buttons.map((button) => {
+					return <FinsembleMenuItem clickChannel={self.state.clickChannel} {...button.item} key={button.index} clickIndex={button.index} onClick={self.onClick} />;
+				})}
 			</FinsembleMenuSection>
-		</FinsembleMenu>
+		</FinsembleMenu>;
 	}
 }
 

@@ -5,13 +5,13 @@
 import React from 'react';
 
 export default class FinsembleMenuSectionLabel extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+	constructor(props) {
+		super(props);
+	}
 
-    render() {
-        return (<div className="menu-section-label">
-            {this.props.children}
-        </div>)
-    }
+	render() {
+		return (<div className="menu-section-label">
+			{this.props.children}
+		</div>);
+	}
 }

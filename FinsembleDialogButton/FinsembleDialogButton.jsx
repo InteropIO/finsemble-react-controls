@@ -16,9 +16,9 @@ export default class FinsembleDialogButton extends React.Component {
 		let size = this.props.buttonSize || 'md';
 		//If you're unfamiliar with this syntax, it's equivalent to
 		//let classes='fsbl-button-' + size;
-		let classes=`fsbl-button-${size}`
+		let classes=`fsbl-button-${size}`;
 		return (<FinsembleButton className={classes} {...this.props} buttonType="Dialog">
 			{this.props.children}
-		</FinsembleButton>)
+		</FinsembleButton>);
 	}
 }

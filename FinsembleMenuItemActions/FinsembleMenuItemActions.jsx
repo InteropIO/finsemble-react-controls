@@ -11,8 +11,8 @@ export default class FinsembleMenuItemActions extends React.Component {
 		super(props);
 	}
 	render() {
-        return (<FinsembleButton buttonType="MenuItemActions" {...this.props}>
+		return (<FinsembleButton buttonType="MenuItemActions" {...this.props}>
 			{this.props.children}
-		</FinsembleButton>)
+		</FinsembleButton>);
 	}
 }
