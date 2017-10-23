@@ -1,20 +1,39 @@
-export { default as FinsembleButton } from './FinsembleButton/FinsembleButton';
-export { default as FinsembleButtonLabel } from './FinsembleButtonLabel/FinsembleButtonLabel';
-export { default as FinsembleDialog } from './FinsembleDialog/FinsembleDialog';
-export { default as FinsembleDialogButton } from './FinsembleDialogButton/FinsembleDialogButton';
-export { default as FinsembleDialoQuestion } from './FinsembleDialogQuestion/FinsembleDialogQuestion';
-export { default as FinsembleDialogTextInput } from './FinsembleDialogTextInput/FinsembleDialogTextInput';
-export { default as FinsembleFontIcon } from './FinsembleFontIcon/FinsembleFontIcon';
-export { default as FinsembleMenu } from './FinsembleMenu/FinsembleMenu';
-export { default as FinsembleMenuItem } from './FinsembleMenuItem/FinsembleMenuItem';
-export { default as FinsembleMenuItemAction } from './FinsembleMenuItemAction/FinsembleMenuItemAction';
-export { default as FinsembleMenuItemActions } from './FinsembleMenuItemActions/FinsembleMenuItemActions';
-export { default as FinsembleMenuItemLabel } from './FinsembleMenuItemLabel/FinsembleMenuItemLabel';
-export { default as FinsembleMenuSection } from './FinsembleMenuSection/FinsembleMenuSection';
-export { default as FinsembleMenuSectionLabel } from './FinsembleMenuSectionLabel/FinsembleMenuSectionLabel';
-export { default as FinsembleOverflowMenu } from './FinsembleOverflowMenu/FinsembleOverflowMenu';
-export { default as FinsembleToolbar } from './FinsembleToolbar/FinsembleToolbar';
-export { default as FinsembleToolbarSection } from './FinsembleToolbarSection/FinsembleToolbarSection';
-export { default as FinsembleToolbarSeparator } from './FinsembleToolbarSeparator/FinsembleToolbarSeparator';
+import FinsembleButton from './FinsembleButton/FinsembleButton';
+import FinsembleButtonLabel from './FinsembleButtonLabel/FinsembleButtonLabel';
+import FinsembleDialog from './FinsembleDialog/FinsembleDialog';
+import FinsembleDialogButton from './FinsembleDialogButton/FinsembleDialogButton';
+import FinsembleDialogQuestion from './FinsembleDialogQuestion/FinsembleDialogQuestion';
+import FinsembleDialogTextInput from './FinsembleDialogTextInput/FinsembleDialogTextInput';
+import FinsembleFontIcon from './FinsembleFontIcon/FinsembleFontIcon';
+import FinsembleMenu from './FinsembleMenu/FinsembleMenu';
+import FinsembleMenuItem from './FinsembleMenuItem/FinsembleMenuItem';
+import FinsembleMenuItemAction from './FinsembleMenuItemAction/FinsembleMenuItemAction';
+import FinsembleMenuItemActions from './FinsembleMenuItemActions/FinsembleMenuItemActions';
+import FinsembleMenuItemLabel from './FinsembleMenuItemLabel/FinsembleMenuItemLabel';
+import FinsembleMenuSection from './FinsembleMenuSection/FinsembleMenuSection';
+import FinsembleMenuSectionLabel from './FinsembleMenuSectionLabel/FinsembleMenuSectionLabel';
+import FinsembleOverflowMenu from './FinsembleOverflowMenu/FinsembleOverflowMenu';
+import FinsembleToolbar from './FinsembleToolbar/FinsembleToolbar';
+import FinsembleToolbarSection from './FinsembleToolbarSection/FinsembleToolbarSection';
+import FinsembleToolbarSeparator from './FinsembleToolbarSeparator/FinsembleToolbarSeparator';
 
-
+export {
+	FinsembleButton,
+	FinsembleButtonLabel,
+	FinsembleDialog,
+	FinsembleDialogButton,
+	FinsembleDialogQuestion,
+	FinsembleDialogTextInput,
+	FinsembleFontIcon,
+	FinsembleMenu,
+	FinsembleMenuItem,
+	FinsembleMenuItemAction,
+	FinsembleMenuItemActions,
+	FinsembleMenuItemLabel,
+	FinsembleMenuSection,
+	FinsembleMenuSectionLabel,
+	FinsembleOverflowMenu,
+	FinsembleToolbar,
+	FinsembleToolbarSection,
+	FinsembleToolbarSeparator
+};
