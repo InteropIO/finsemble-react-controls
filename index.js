@@ -17,7 +17,7 @@ import FinsembleToolbar from './FinsembleToolbar/FinsembleToolbar';
 import FinsembleToolbarSection from './FinsembleToolbarSection/FinsembleToolbarSection';
 import FinsembleToolbarSeparator from './FinsembleToolbarSeparator/FinsembleToolbarSeparator';
 
-let components = {
+export default {
 	FinsembleButton,
 	FinsembleButtonLabel,
 	FinsembleDialog,
@@ -37,4 +37,3 @@ let components = {
 	FinsembleToolbarSection,
 	FinsembleToolbarSeparator
 };
-export default components;

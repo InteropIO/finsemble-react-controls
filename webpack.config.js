@@ -51,7 +51,9 @@ module.exports = {
 	},
 	output: {
 		filename: './dist/index.js',
-		sourceMapFilename: './dist/index.js.map'
+		sourceMapFilename: './dist/index.js.map',
+		library: 'library',
+		libraryTarget: 'umd'
 	},
 	resolve: {
 		extensions: ['.js', '.jsx', '.json', 'scss']
