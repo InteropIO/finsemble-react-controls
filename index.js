@@ -17,7 +17,7 @@ import FinsembleToolbar from './FinsembleToolbar/FinsembleToolbar';
 import FinsembleToolbarSection from './FinsembleToolbarSection/FinsembleToolbarSection';
 import FinsembleToolbarSeparator from './FinsembleToolbarSeparator/FinsembleToolbarSeparator';
 
-export {
+export default {
 	FinsembleButton,
 	FinsembleButtonLabel,
 	FinsembleDialog,
