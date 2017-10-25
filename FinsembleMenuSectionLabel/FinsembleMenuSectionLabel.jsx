@@ -2,17 +2,16 @@
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
-const React = require('react');
+import React from 'react';
 
-class FinsembleMenuSectionLabel extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+export default class FinsembleMenuSectionLabel extends React.Component {
+	constructor(props) {
+		super(props);
+	}
 
-    render() {
-        return (<div className="menu-section-label">
-            {this.props.children}
-        </div>)
-    }
+	render() {
+		return (<div className="menu-section-label">
+			{this.props.children}
+		</div>);
+	}
 }
-module.exports = FinsembleMenuSectionLabel;

@@ -4,16 +4,15 @@
 */
 
 const BUTTON_BASE_CLASS = '';
-const React = require('react');
-var FinsembleButton = require('../FinsembleButton/FinsembleButton');
-class FinsembleMenuItemActions extends React.Component {
+import React from 'react';
+import FinsembleButton from '../FinsembleButton/FinsembleButton';
+export default class FinsembleMenuItemActions extends React.Component {
 	constructor(props) {
 		super(props);
 	}
 	render() {
-        return (<FinsembleButton buttonType="MenuItemActions" {...this.props}>
+		return (<FinsembleButton buttonType="MenuItemActions" {...this.props}>
 			{this.props.children}
-		</FinsembleButton>)
+		</FinsembleButton>);
 	}
 }
-module.exports = FinsembleMenuItemActions;

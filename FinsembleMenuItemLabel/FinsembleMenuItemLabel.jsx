@@ -3,16 +3,16 @@
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
-const React = require('react');
-var FinsembleButton = require('../FinsembleButton/FinsembleButton');
-class FinsembleMenuItemLabel extends React.Component {
+import React from 'react';
+import FinsembleButton from '../FinsembleButton/FinsembleButton';
+
+export default class FinsembleMenuItemLabel extends React.Component {
 	constructor(props) {
 		super(props);
 	}
-    render() {
-        return (<FinsembleButton buttonType="MenuItemLabel" {...this.props}>
+	render() {
+		return (<FinsembleButton buttonType="MenuItemLabel" {...this.props}>
 			{this.props.children}
-		</FinsembleButton>)
+		</FinsembleButton>);
 	}
 }
-module.exports = FinsembleMenuItemLabel;

@@ -2,20 +2,19 @@
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
 */
-const React = require('react');
+import React from 'react';
+import FinsembleMenu from '../FinsembleMenu/FinsembleMenu';
+import FinsembleMenuItem from '../FinsembleMenuItem/FinsembleMenuItem';
+import FinsembleMenuSection from '../FinsembleMenuSection/FinsembleMenuSection';
 
-const FinsembleMenu = require('../FinsembleMenu/FinsembleMenu');
-const FinsembleMenuItem = require('../FinsembleMenuItem/FinsembleMenuItem');
-const FinsembleMenuSection = require('../FinsembleMenuSection/FinsembleMenuSection');
-
-class FinsembleOverflowMenu extends React.Component {
+export default class FinsembleOverflowMenu extends React.Component {
 	constructor(props) {
 		// Build a store for overflow
 		super(props);
 		var self = this;
 		self.state = {
 			buttons: []
-		}
+		};
 		this.onStateChange = props.onStateChange || function noop() { };
 		this.buttonChangeListener = this.buttonChangeListener.bind(this);
 		this.clickChannelListner = this.clickChannelListner.bind(this);
@@ -42,10 +41,10 @@ class FinsembleOverflowMenu extends React.Component {
 
 			});
 
-			store.addListener({ field: 'buttons' }, self.buttonChangeListener)
+			store.addListener({ field: 'buttons' }, self.buttonChangeListener);
 
-			store.addListener({ field: 'clickChannel' }, self.clickChannelListner)
-		})
+			store.addListener({ field: 'clickChannel' }, self.clickChannelListner);
+		});
 	}
 
 	componentDidUpdate() {
@@ -69,12 +68,11 @@ class FinsembleOverflowMenu extends React.Component {
 
 		return <FinsembleMenu>
 			<FinsembleMenuSection className='menu-primary'>
-			{this.state.buttons.map((button) => {
-				return <FinsembleMenuItem clickChannel={self.state.clickChannel} {...button.item} key={button.index} clickIndex={button.index} onClick={self.onClick} />
-			})}
+				{this.state.buttons.map((button) => {
+					return <FinsembleMenuItem clickChannel={self.state.clickChannel} {...button.item} key={button.index} clickIndex={button.index} onClick={self.onClick} />;
+				})}
 			</FinsembleMenuSection>
-		</FinsembleMenu>
+		</FinsembleMenu>;
 	}
 }
 
-module.exports = FinsembleOverflowMenu;

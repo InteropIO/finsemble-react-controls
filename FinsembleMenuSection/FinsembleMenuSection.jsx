@@ -3,9 +3,10 @@
 * All rights reserved.
 */
 
-const React = require('react');
+import React from 'react';
 const SECTION_BASE_CLASS = 'menu-section';
-class FinsembleMenuSection extends React.Component {
+
+export default class FinsembleMenuSection extends React.Component {
 	constructor(props) {
 		super(props);
 		this.props = props;
@@ -62,22 +63,21 @@ class FinsembleMenuSection extends React.Component {
 	render() {
 		let styles = {
 			height: this.state.maxHeight
+		};
+
+		let classes = this.props.className || SECTION_BASE_CLASS;
+		if (classes !== SECTION_BASE_CLASS) {
+			//If you're unfamiliar with this syntax, it's equivalent to
+		    //classes+=' ' + SECTION_BASE_CLASS;
+			classes +=  ` ${SECTION_BASE_CLASS}`;
 		}
 
-        let classes = this.props.className || SECTION_BASE_CLASS;
-        if (classes !== SECTION_BASE_CLASS) {
-            //If you're unfamiliar with this syntax, it's equivalent to
-		    //classes+=' ' + SECTION_BASE_CLASS;
-            classes +=  ` ${SECTION_BASE_CLASS}`;
-        }
-
 		return (<div  ref={(el) => {
-			this.wrapperReference = el
+			this.wrapperReference = el;
 		}}  {...this.props} style={styles} className={classes}>
 			{this.props.children}
-		</div>)
+		</div>);
 
 
 	}
 }
-module.exports = FinsembleMenuSection;
