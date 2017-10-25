@@ -122,8 +122,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		var OverflowComponent = this.props.overflowMenuComponent;
 		var self = this;
 		return (<div className={classes} ref={(e) => { this.element = e; }}>
-			{this.props.children[0]}
-			{this.props.children[1].map((item, index) => {
+			{this.props.children.map((item, index) => {
 				if (self.state.minOverflowIndex && index >= self.state.minOverflowIndex) {
 					var comps = [];
 					// render the overflow component
@@ -141,7 +140,6 @@ export default class FinsembleToolbarSection extends React.Component {
 					return item;
 				}
 			})}
-			{this.props.children[2]}
 		</div>);
 	}
 }
