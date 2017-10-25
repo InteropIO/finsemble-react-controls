@@ -50,7 +50,7 @@ class FinsembleToolbarSection extends React.Component {
     onToolbarStateChanged(err, data) {
         if (data.value) {
             this.setState({ minOverflowIndex: 10000000 }) // this will force all components to re-render which will cause a recalculation of overflow
-            store.setValue({ field: 'toolbarStateChanged', value: false });
+            this.overflowStore.setValue({ field: 'toolbarStateChanged', value: false });
         }
     }
     /**
