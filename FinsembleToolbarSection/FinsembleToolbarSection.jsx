@@ -24,7 +24,9 @@ export default class FinsembleToolbarSection extends React.Component {
 	constructor(props) {
 		super(props);
 		this.props = props;
-		this.state = {};
+		this.state = {
+			clickChannel: this.props.clickChannel || FSBL.Clients.WindowClient.windowName + '-overflow-clickChannel'
+		};
 		var self = this;
 
 
@@ -129,7 +131,7 @@ export default class FinsembleToolbarSection extends React.Component {
 
 
 			// listener for overflow clicks
-			FSBL.Clients.RouterClient.addListener(this.props.clickChannel, function (err, response) {
+			FSBL.Clients.RouterClient.addListener(this.state.clickChannel, function (err, response) {
 				self.triggerClick(response.data.index);
 			});
 
@@ -214,7 +216,7 @@ export default class FinsembleToolbarSection extends React.Component {
      * @memberof FinsembleToolbarSection
      */
 	saveButtonsToOverflowStore(e, self) {
-		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.props.clickChannel });
+		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.state.clickChannel });
 		self.state.overflowStore.setValue({ field: 'buttons', value: self.state.overflow });
 	}
 
