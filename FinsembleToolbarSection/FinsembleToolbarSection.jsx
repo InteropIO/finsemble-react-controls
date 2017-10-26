@@ -34,6 +34,7 @@ export default class FinsembleToolbarSection extends React.Component {
 	// Process pin changes on the toolbar store
 	processPins(err, pins) {
 		pins = pins.value;
+		FSBL.Clients.StorageClient.save({ topic: "finsemble", key: "toolbarPins", value: pins });
 		if (!pins) { return }
 		var pinArray = [];
 		var newPins = [];
@@ -76,7 +77,6 @@ export default class FinsembleToolbarSection extends React.Component {
 
 		// If pins have changed, rerender
 		if (pinsChanged) {
-			FSBL.Clients.StorageClient.save({ topic: "finsemble", key: "toolbarPins", value: pinArray });
 			this.setState({ pins: myPins });
 		}
 	}
