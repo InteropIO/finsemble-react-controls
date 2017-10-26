@@ -31,6 +31,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.processPins = this.processPins.bind(this);
 	}
 
+	// Process pin changes on the toolbar store
 	processPins(err, pins) {
 		pins = pins.value;
 		if (!pins) { return }
@@ -73,6 +74,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			}
 		}
 
+		// If pins have changed, rerender
 		if (pinsChanged) {
 			FSBL.Clients.StorageClient.save({ topic: "finsemble", key: "toolbarPins", value: pinArray });
 			this.setState({ pins: myPins });
@@ -193,7 +195,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			for (var i = 0; i < e.children.length; i++) {
 				var item = e.children[i];
 				if ((item.offsetLeft + item.offsetWidth) > right) {
-					overflow.push({ item: self.props.children[1][i].props, index: i });
+					overflow.push({ item: self.children[i].props, index: i });
 				}
 			}
 			self.setState({
@@ -239,16 +241,16 @@ export default class FinsembleToolbarSection extends React.Component {
 		let classes = this.props.className || '';
 		classes += ` ${SECTION_BASE_CLASS}`;
 
-		var children = this.props.handlePins ? this.renderpins() : this.props.children;
+		this.children = this.props.handlePins ? this.renderpins() : this.props.children;
 		var OverflowComponent = this.state.overflowMenuComponent;
 		var self = this;
 		var section = (<div className={classes} ref={(e) => { this.element = e; }}>
-			{Array.isArray(children) && children.map((item, index) => {
+			{Array.isArray(this.children) && this.children.map((item, index) => {
 				if (self.state.minOverflowIndex && index >= self.state.minOverflowIndex) {
 					var comps = [];
 					// render the overflow component
 					if (index == self.state.minOverflowIndex) {
-						comps.push(<OverflowComponent beforeClick={function (e) { self.saveButtonsToOverflowStore(e, self); }} {...self.props.overflowProps} key={'overflow' + index} />);
+						comps.push(<OverflowComponent beforeClick={function (e) { self.saveButtonsToOverflowStore(e, self); }} {...self.state.overflowMenuProps} key={'overflow' + index} />);
 					}
 					// render the rest of the components hidden
 					comps.push(<div style={{ display: 'none' }}>{item}</div>);
