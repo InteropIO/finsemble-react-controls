@@ -34,9 +34,8 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	// Process pin changes on the toolbar store
-	processPins(err, pins) {
-		pins = pins.value;
-		FSBL.Clients.StorageClient.save({ topic: "finsemble", key: "toolbarPins", value: pins });
+	processPins(err, data) {
+		var pins = data.value;
 		if (!pins) { return }
 		var pinArray = [];
 		var newPins = [];
@@ -56,7 +55,7 @@ export default class FinsembleToolbarSection extends React.Component {
 						} else {
 							pinArray[pin.index] = pin;
 						}
-						if (pin.toolbarSection == this.props.name) myPins.push(pin);
+						//if (pin.toolbarSection == this.props.name) myPins[pin.index] = pin;
 					}
 				} else {
 					delete pins[i];
@@ -71,16 +70,23 @@ export default class FinsembleToolbarSection extends React.Component {
 				if (pin) {
 					pin.index = nextIndex + 1;
 					pinArray.push(pin);
-					if (pin.toolbarSection == this.props.name) myPins.push(pin);
+					//if (pin.toolbarSection == this.props.name) myPins[pin.index] = pin;
 					pinsChanged = true;
 				}
 			}
 		}
 
 		// If pins have changed, rerender
-		if (pinsChanged) {
+		if (pinsChanged || this.initialLoad) {
+			for (var i = 0; i < pinArray.length; i++) {
+				if (pinArray[i] && pinArray[i].toolbarSection == this.props.name) myPins.push(pinArray[i]);
+			}
 			this.setState({ pins: myPins });
+			FSBL.Clients.StorageClient.save({ topic: "finsemble", key: "toolbarPins", value: pins });
+			this.state.pinStore.setValue({ field: 'pins', value: pins });
+			this.initialLoad = false;
 		}
+
 	}
 
 	/**
@@ -143,6 +149,7 @@ export default class FinsembleToolbarSection extends React.Component {
 				self.setState({ pinStore: store });
 				FSBL.Clients.StorageClient.get({ topic: "finsemble", key: "toolbarPins" }, function (err, pins) {
 					store.setValue({ field: 'pins', value: pins })
+					self.initialLoad = true;
 				});
 				store.addListener({ field: 'pins' }, self.processPins);
 			});
