@@ -235,7 +235,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			if (!pin) continue;
 			var Component = this.props.pinnableItems[pin.type];
 			switch (pin.type) {
-				case 'component':
+				case 'componentLauncher':
 					components.push(<Component key={i} iconClasses="pinned-icon" buttonType={["AppLauncher", "Toolbar"]} {...pin} />);
 					break;
 				default:
