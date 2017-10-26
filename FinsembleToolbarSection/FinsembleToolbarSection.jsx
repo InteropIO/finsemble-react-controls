@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import FinsembleButton from '../FinsembleButton/FinsembleButton';
 const SECTION_BASE_CLASS = 'finsemble-toolbar-section';
 
 export default class FinsembleToolbarSection extends React.Component {
@@ -25,35 +26,92 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.props = props;
 		this.state = {};
 		var self = this;
-		// listener for overflow clicks
-		FSBL.Clients.RouterClient.addListener(this.props.clickChannel, function (err, response) {
-			self.triggerClick(response.data.index);
-		});
 
-		this.saveButtonsToOverflowStore = this.saveButtonsToOverflowStore.bind(this);
-		this.onToolbarStateChanged = this.onToolbarStateChanged.bind(this);
+
+
+		if (this.props.handleOverflow) {
+			// overflow handling
+			if (this.props.overflowMenuComponent) {
+				this.state.overflowMenuComponent = this.props.overflowMenu;
+				this.state.overflowMenuProps = this.props.overflowMenuProps;
+			} else {
+				this.state.overflowMenuComponent = FinsembleButton;
+				this.state.overflowMenuProps = {
+					buttonType: ["Toolbar", "MenuLauncher"],
+					menuType: "Overflow Menu",
+					title: "Overflow",
+					fontIcon: "ff-caret-down"
+				};
+			}
+
+			var overflowMenuStoreName = this.props.overflowMenuStoreName || "OverflowMenuStore";
+
+			// create/get a store for checking if overflowmenu has been spawned. If not, spawn
+			FSBL.Clients.DataStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
+				self.state.overflowStore = store;
+				store.getValue({ field: 'menuSpawned' }, function (err, menuSpawned) {
+					if (!menuSpawned) {
+						self.spawnMenu(self.state.overflowMenuProps);
+					}
+					store.setValue({ field: 'menuSpawned', value: true });
+				});
+			});
+
+
+			// listener for overflow clicks
+			FSBL.Clients.RouterClient.addListener(this.props.clickChannel, function (err, response) {
+				self.triggerClick(response.data.index);
+			});
+
+		}
+
+		if (this.props.handlePins) {
+			FSBL.Clients.DataStoreClient.createStore({ global: true, store: 'Finsemble-Pins' }, function (err, store) {
+				// Load pins from storage
+				self.state.pinStore = store;
+				FSBL.Clients.StorageClient.get({ topic: "finsemble", key: "toolbarPins" }, function (err, pins) {
+					store.setValue({field: 'pins', value: pins})
+				});
+				store.addListener({ field: 'pins' }, function (err, pins) {
+					self.processPins(pins);
+				});
+			});
+		}
+
+		this.processPins = this.processPins.bind(this);
+	}
+
+	processPins(pins) {
 
 	}
 
-	componentWillMount() {
-		let self = this;
-		FSBL.Clients.DataStoreClient.createStore({ store: this.props.overflowMenuStore, global: true }, function (err, store) {
-			self.overflowStore = store;
-			// Listen for all toolbar changes - the toolbar must change this value -> need to redo overflow if any section changes, not just this one.
-			store.addListener({ field: 'toolbarStateChanged' }, self.onToolbarStateChanged);
+	/**
+	 * Spawn a menu
+	 *
+	 */
+	spawnMenu(menu) {
+		let windowName = menu.menuType + (menu.label ? menu.label : menu.tooltip);
+		const COMPONENT_UPDATE_CHANNEL = `${windowName}.ComponentsToRender`;
+		FSBL.Clients.LauncherClient.showWindow({
+			windowName: windowName,
+			componentType: menu.menuType
+		}, { spawnIfNotFound: true }, function (err, response) {
+			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, menu.customData);
 		});
+	}
+
+	componentDidMount() {
+		window.addEventListener('resize', this.handleResize);
 	}
 
 	componentWillUnmount() {
-		this.overflowStore.removeListener({ field: 'toolbarStateChanged' }, self.onToolbarStateChanged);
+		window.removeEventListener('resize', this.handleResize);
 	}
 
-	onToolbarStateChanged(err, data) {
-		if (data.value) {
-			this.setState({ minOverflowIndex: 10000000 }); // this will force all components to re-render which will cause a recalculation of overflow
-			this.overflowStore.setValue({ field: 'toolbarStateChanged', value: false });
-		}
+	handleResize(e) {
+		this.setState({ minOverflowIndex: 10000000 }); // this will force all components to re-render which will cause a recalculation of overflow
 	}
+
 	/**
      * Trigger a click on the proper item. index + 1 because overflow menu launching component is added.
      *
@@ -118,11 +176,11 @@ export default class FinsembleToolbarSection extends React.Component {
 	render() {
 		let classes = this.props.className || '';
 		classes += ` ${SECTION_BASE_CLASS}`;
-		var children = this.props.children.slice();
-		var OverflowComponent = this.props.overflowMenuComponent;
+		//var children = this.props.children.slice();
+		var OverflowComponent = this.state.overflowMenuComponent;
 		var self = this;
 		return (<div className={classes} ref={(e) => { this.element = e; }}>
-			{this.props.children.map((item, index) => {
+			{Array.isArray(this.props.children) && this.props.children.map((item, index) => {
 				if (self.state.minOverflowIndex && index >= self.state.minOverflowIndex) {
 					var comps = [];
 					// render the overflow component
