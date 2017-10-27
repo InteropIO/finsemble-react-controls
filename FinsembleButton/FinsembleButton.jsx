@@ -57,6 +57,14 @@ export default class Button extends React.Component {
 		this.finWindow = fin.desktop.Window.getCurrent();
 		//Used by menuLaunchers. see `this.launchMenu` for more.
 		this.openMenuOnClick = true;
+		var types = this.props.buttonType || [];
+		//coerce to array.
+		if (typeof types === 'string') {
+			types = [types];
+		}
+		this.state = {
+			types: types
+		}
 	}
 
 	/**
@@ -68,6 +76,7 @@ export default class Button extends React.Component {
 		this.launchMenu = this.launchMenu.bind(this);
 		this.launchComponent = this.launchComponent.bind(this);
 		this.validateProps = this.validateProps.bind(this);
+		this.spawnMenu = this.spawnMenu.bind(this);
 	}
 
 	/**
@@ -172,6 +181,44 @@ export default class Button extends React.Component {
 	 */
 	warn(msg) {
 		console.warn(msg);
+	}
+	spawnMenu(menu) {
+		let windowName = this.props.menuType + (this.props.label || this.props.tooltip);
+		const COMPONENT_UPDATE_CHANNEL = `${windowName}.ComponentsToRender`;
+		FSBL.Clients.LauncherClient.spawn(this.props.menuType,null, function (err, descr) {
+			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, this.props.data);
+		})
+		/*FSBL.Clients.LauncherClient.showWindow({
+			windowName: windowName,
+			componentType: this.props.menuType
+		}, { spawnIfNotFound: true }, function (err, response) {
+			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, this.props.data);
+		});*/
+	}
+	componentWillMount() {
+		console.log("this.button state", this.state)
+		if (this.state.types.includes("MenuLauncher")) {
+			var self = this;
+			FSBL.Clients.DataStoreClient.createStore({
+				store: "Finsemble-Menu-Store",
+				global: true,
+				values: { creator: fin.desktop.Window.getCurrent().name }
+			}, function (err, store) {
+				self.store = store;
+				store.getValues(["menus", "creator"], function (err, data) {
+					if (err) return console.error(err);
+					if (!data.creator === fin.desktop.Window.getCurrent().name) return;//If this button didn't create the store don't do anything
+					if (!data.menus || !data.menus[self.props.menuType]) {// If the menu doesn't exist yet spawn it.
+						self.spawnMenu();
+					}
+				})
+
+
+
+			});
+		}
+
+
 	}
 
 	render() {
