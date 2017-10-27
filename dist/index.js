@@ -921,14 +921,15 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		};
 
 		//Display the menu.
+		let windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : "");
 		FSBL.Clients.LauncherClient.showWindow({
-			windowName: self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip),
+			windowName: windowName,
 			componentType: self.props.menuType
 		}, params, onMenuShown);
 	}
 
 	launchComponent(e) {
-		FSBL.Clients.LauncherClient.spawn(this.props.component, { addToWorkspace: true });
+		FSBL.Clients.LauncherClient.spawn(this.props.component, { addToWorkspace: true }, { monitor: 'mine' });
 	}
 
 	/**
@@ -940,35 +941,42 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	warn(msg) {
 		console.warn(msg);
 	}
-	spawnMenu(menu) {
-		let windowName = this.props.menuType + (this.props.label || this.props.tooltip);
+	spawnMenu(cb) {
+		let self = this;
+		let windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : "");
 		const COMPONENT_UPDATE_CHANNEL = `${windowName}.ComponentsToRender`;
-		FSBL.Clients.LauncherClient.spawn(this.props.menuType, null, function (err, descr) {
-			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, this.props.data);
+
+		FSBL.Clients.LauncherClient.showWindow({
+			windowName: windowName,
+			componentType: this.props.menuType
+		}, { spawnIfNotFound: true }, function (err, response) {
+			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.data);
+			return cb();
 		});
-		/*FSBL.Clients.LauncherClient.showWindow({
-  	windowName: windowName,
-  	componentType: this.props.menuType
-  }, { spawnIfNotFound: true }, function (err, response) {
-  	FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, this.props.data);
-  });*/
 	}
 	componentWillMount() {
-		console.log("this.button state", this.state);
-		if (this.state.types.includes("MenuLauncher")) {
-			var self = this;
+		if (this.state.types.includes("MenuLauncher") && this.props.preSpawn) {
+			let self = this;
 			FSBL.Clients.DataStoreClient.createStore({
 				store: "Finsemble-Menu-Store",
 				global: true,
 				values: { creator: fin.desktop.Window.getCurrent().name }
 			}, function (err, store) {
 				self.store = store;
-				store.getValues(["menus", "creator"], function (err, data) {
+				store.getValues(function (err, data) {
 					if (err) return console.error(err);
-					if (!data.creator === fin.desktop.Window.getCurrent().name) return; //If this button didn't create the store don't do anything
-					if (!data.menus || !data.menus[self.props.menuType]) {
+					let isCreator = data.creator === fin.desktop.Window.getCurrent().name;
+					if (!isCreator) return;
+
+					//If this button didn't create the store don't do anything
+					if (!data || !data[self.props.menuType]) {
 						// If the menu doesn't exist yet spawn it.
-						self.spawnMenu();
+						self.spawnMenu(function () {
+							if (!data) {
+								data = {};
+							}
+							self.store.setValue({ field: self.props.menuType, value: true });
+						});
 					}
 				});
 			});
@@ -1049,6 +1057,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 			{ onMouseUp: this.props.onMouseUp,
 				onMouseDown: this.props.onMouseDown,
 				onClick: this.onClick,
+				title: this.props.title || "",
 				className: classes },
 			image,
 			label,
@@ -2513,6 +2522,7 @@ class FinsembleMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 		this.onBeforeUnload = this.onBeforeUnload.bind(this);
 		this.onBoundsChanged = this.onBoundsChanged.bind(this);
 		this.addListeners = this.addListeners.bind(this);
+		this.cacheBounds = this.cacheBounds.bind(this);
 	}
 	/**
      * Adds listeners that will handle page reloads, and the user pressing the escape key.
@@ -2627,7 +2637,7 @@ class FinsembleMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
 		if (this.props.padding) {
 			FSBL.Clients.WindowClient.fitToDOM({
 				padding: this.props.padding
-			});
+			}, this.cacheBounds);
 		}
 	}
 	render() {
@@ -6078,16 +6088,17 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 	constructor(props) {
 		super(props);
 		this.props = props;
-		this.state = {};
+		this.state = {
+			clickChannel: this.props.clickChannel || FSBL.Clients.WindowClient.windowName + '-overflow-clickChannel'
+		};
 		var self = this;
 
 		this.processPins = this.processPins.bind(this);
 	}
 
 	// Process pin changes on the toolbar store
-	processPins(err, pins) {
-		pins = pins.value;
-		FSBL.Clients.StorageClient.save({ topic: "finsemble", key: "toolbarPins", value: pins });
+	processPins(err, data) {
+		var pins = data.value;
 		if (!pins) {
 			return;
 		}
@@ -6109,7 +6120,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 						} else {
 							pinArray[pin.index] = pin;
 						}
-						if (pin.toolbarSection == this.props.name) myPins.push(pin);
+						//if (pin.toolbarSection == this.props.name) myPins[pin.index] = pin;
 					}
 				} else {
 					delete pins[i];
@@ -6124,15 +6135,21 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 				if (pin) {
 					pin.index = nextIndex + 1;
 					pinArray.push(pin);
-					if (pin.toolbarSection == this.props.name) myPins.push(pin);
+					//if (pin.toolbarSection == this.props.name) myPins[pin.index] = pin;
 					pinsChanged = true;
 				}
 			}
 		}
 
 		// If pins have changed, rerender
-		if (pinsChanged) {
+		if (pinsChanged || this.initialLoad) {
+			for (var i = 0; i < pinArray.length; i++) {
+				if (pinArray[i] && pinArray[i].toolbarSection == this.props.name) myPins.push(pinArray[i]);
+			}
 			this.setState({ pins: myPins });
+			FSBL.Clients.StorageClient.save({ topic: "finsemble", key: "toolbarPins", value: pins });
+			this.state.pinStore.setValue({ field: 'pins', value: pins });
+			this.initialLoad = false;
 		}
 	}
 
@@ -6183,7 +6200,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 			});
 
 			// listener for overflow clicks
-			FSBL.Clients.RouterClient.addListener(this.props.clickChannel, function (err, response) {
+			FSBL.Clients.RouterClient.addListener(this.state.clickChannel, function (err, response) {
 				self.triggerClick(response.data.index);
 			});
 		}
@@ -6194,6 +6211,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 				self.setState({ pinStore: store });
 				FSBL.Clients.StorageClient.get({ topic: "finsemble", key: "toolbarPins" }, function (err, pins) {
 					store.setValue({ field: 'pins', value: pins });
+					self.initialLoad = true;
 				});
 				store.addListener({ field: 'pins' }, self.processPins);
 			});
@@ -6266,7 +6284,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
      * @memberof FinsembleToolbarSection
      */
 	saveButtonsToOverflowStore(e, self) {
-		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.props.clickChannel });
+		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.state.clickChannel });
 		self.state.overflowStore.setValue({ field: 'buttons', value: self.state.overflow });
 	}
 
@@ -6280,7 +6298,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 			if (!pin) continue;
 			var Component = this.props.pinnableItems[pin.type];
 			switch (pin.type) {
-				case 'component':
+				case 'componentLauncher':
 					components.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(Component, _extends({ key: i, iconClasses: 'pinned-icon', buttonType: ["AppLauncher", "Toolbar"] }, pin)));
 					break;
 				default:
