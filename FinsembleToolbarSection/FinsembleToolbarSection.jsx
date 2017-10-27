@@ -127,7 +127,6 @@ export default class FinsembleToolbarSection extends React.Component {
 				});
 			});
 
-
 			// listener for overflow clicks
 			FSBL.Clients.RouterClient.addListener(this.props.clickChannel, function (err, response) {
 				self.triggerClick(response.data.index);
