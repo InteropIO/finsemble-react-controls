@@ -22,9 +22,6 @@ export default class FinsembleDialog extends React.Component {
 		FSBL.Clients.DialogManager.userInputTimeout = this.state.userInputTimeout;
 		FSBL.Clients.DialogManager.isModal = this.props.isModal;
 
-		if (this.props.isModal) {
-			this.finWindow.addEventListener('shown', FSBL.Clients.DialogManager.showModal);
-		}
 
 		this.addResponder();
 
@@ -82,6 +79,15 @@ export default class FinsembleDialog extends React.Component {
 	componentDidMount() {
 		//DialogManager uses this when it sends its response back to the originating window. After that response is sent, we either hide or close the dialog.
 		FSBL.Clients.DialogManager.behaviorOnResponse = this.state.behaviorOnResponse;
+		if (this.props.isModal) {
+			this.finWindow.addEventListener('shown', FSBL.Clients.DialogManager.showModal);
+		}
+	}
+
+	componentDidUnmount() {
+		if (this.props.isModal) {
+			this.finWindow.removeEventListener('shown', FSBL.Clients.DialogManager.showModal);
+		}
 	}
 
 	addResponder() {

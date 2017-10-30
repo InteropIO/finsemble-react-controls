@@ -57,6 +57,14 @@ export default class Button extends React.Component {
 		this.finWindow = fin.desktop.Window.getCurrent();
 		//Used by menuLaunchers. see `this.launchMenu` for more.
 		this.openMenuOnClick = true;
+		var types = this.props.buttonType || [];
+		//coerce to array.
+		if (typeof types === 'string') {
+			types = [types];
+		}
+		this.state = {
+			types: types
+		}
 	}
 
 	/**
@@ -68,6 +76,7 @@ export default class Button extends React.Component {
 		this.launchMenu = this.launchMenu.bind(this);
 		this.launchComponent = this.launchComponent.bind(this);
 		this.validateProps = this.validateProps.bind(this);
+		this.spawnMenu = this.spawnMenu.bind(this);
 	}
 
 	/**
@@ -154,14 +163,15 @@ export default class Button extends React.Component {
 		};
 
 		//Display the menu.
+		let windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : "")
 		FSBL.Clients.LauncherClient.showWindow({
-			windowName: self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip),
+			windowName: windowName,
 			componentType: self.props.menuType
 		}, params, onMenuShown);
 	}
 
 	launchComponent(e) {
-		FSBL.Clients.LauncherClient.spawn(this.props.component, { addToWorkspace: true });
+		FSBL.Clients.LauncherClient.spawn(this.props.component, { addToWorkspace: true }, { monitor: 'mine' });
 	}
 
 	/**
@@ -172,6 +182,46 @@ export default class Button extends React.Component {
 	 */
 	warn(msg) {
 		console.warn(msg);
+	}
+	spawnMenu(cb) {
+		let self = this;
+		let windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : "")
+		const COMPONENT_UPDATE_CHANNEL = `${windowName}.ComponentsToRender`;
+
+		FSBL.Clients.LauncherClient.showWindow({
+			windowName: windowName,
+			componentType: this.props.menuType,
+		}, { spawnIfNotFound: true }, function (err, response) {
+			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.data);
+			return cb();
+		});
+	}
+	componentWillMount() {
+		if (this.state.types.includes("MenuLauncher") && this.props.preSpawn) {
+			let self = this;
+			FSBL.Clients.DataStoreClient.createStore({
+				store: "Finsemble-Menu-Store",
+				global: true,
+				values: { creator: fin.desktop.Window.getCurrent().name }
+			}, function (err, store) {
+				self.store = store;
+				store.getValues(function (err, data) {
+					if (err) return console.error(err);
+					let isCreator = data.creator === fin.desktop.Window.getCurrent().name
+					if (!isCreator) return;
+
+					//If this button didn't create the store don't do anything
+					if (!data || !data[self.props.menuType]) {// If the menu doesn't exist yet spawn it.
+						self.spawnMenu(function () {
+							if (!data) {
+								data = {}
+							}
+							self.store.setValue({ field: self.props.menuType, value: true })
+						});
+					}
+				})
+			});
+		}
 	}
 
 	render() {
@@ -247,6 +297,7 @@ export default class Button extends React.Component {
 		return (<div onMouseUp={this.props.onMouseUp}
 			onMouseDown={this.props.onMouseDown}
 			onClick={this.onClick}
+			title={this.props.title || ""}
 			className={classes}>
 			{image}
 			{label}

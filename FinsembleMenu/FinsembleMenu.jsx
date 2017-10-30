@@ -60,6 +60,7 @@ export default class FinsembleMenu extends React.Component {
 		this.onBeforeUnload = this.onBeforeUnload.bind(this);
 		this.onBoundsChanged = this.onBoundsChanged.bind(this);
 		this.addListeners = this.addListeners.bind(this);
+		this.cacheBounds = this.cacheBounds.bind(this);
 	}
 	/**
      * Adds listeners that will handle page reloads, and the user pressing the escape key.
@@ -179,7 +180,7 @@ export default class FinsembleMenu extends React.Component {
 		if (this.props.padding) {
 			FSBL.Clients.WindowClient.fitToDOM({
 				padding: this.props.padding
-			});
+			}, this.cacheBounds);
 		}
 	}
 	render() {
