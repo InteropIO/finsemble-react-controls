@@ -5689,10 +5689,6 @@ class FinsembleDialog extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Comp
 		FSBL.Clients.DialogManager.userInputTimeout = this.state.userInputTimeout;
 		FSBL.Clients.DialogManager.isModal = this.props.isModal;
 
-		if (this.props.isModal) {
-			this.finWindow.addEventListener('shown', FSBL.Clients.DialogManager.showModal);
-		}
-
 		this.addResponder();
 
 		document.body.addEventListener('keydown', this.handleKeyDown);
@@ -5749,6 +5745,15 @@ class FinsembleDialog extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Comp
 	componentDidMount() {
 		//DialogManager uses this when it sends its response back to the originating window. After that response is sent, we either hide or close the dialog.
 		FSBL.Clients.DialogManager.behaviorOnResponse = this.state.behaviorOnResponse;
+		if (this.props.isModal) {
+			this.finWindow.addEventListener('shown', FSBL.Clients.DialogManager.showModal);
+		}
+	}
+
+	componentDidUnmount() {
+		if (this.props.isModal) {
+			this.finWindow.removeEventListener('shown', FSBL.Clients.DialogManager.showModal);
+		}
 	}
 
 	addResponder() {
@@ -6182,7 +6187,8 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 					buttonType: ["Toolbar", "MenuLauncher"],
 					menuType: "Overflow Menu",
 					title: "Overflow",
-					fontIcon: "ff-caret-down"
+					fontIcon: "ff-caret-down",
+					preSpawn: true
 				};
 			}
 
@@ -6191,12 +6197,6 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 			// create/get a store for checking if overflowmenu has been spawned. If not, spawn
 			FSBL.Clients.DataStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
 				self.setState({ overflowStore: store });
-				store.getValue({ field: 'menuSpawned' }, function (err, menuSpawned) {
-					if (!menuSpawned) {
-						self.spawnMenu(self.state.overflowMenuProps);
-					}
-					store.setValue({ field: 'menuSpawned', value: true });
-				});
 			});
 
 			// listener for overflow clicks
