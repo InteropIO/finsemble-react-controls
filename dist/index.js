@@ -921,7 +921,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		};
 
 		//Display the menu.
-		let windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : "");
+		let windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : '');
 		FSBL.Clients.LauncherClient.showWindow({
 			windowName: windowName,
 			componentType: self.props.menuType
@@ -943,7 +943,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	}
 	spawnMenu(cb) {
 		let self = this;
-		let windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : "");
+		let windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
 		const COMPONENT_UPDATE_CHANNEL = `${windowName}.ComponentsToRender`;
 
 		FSBL.Clients.LauncherClient.showWindow({
@@ -955,10 +955,10 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		});
 	}
 	componentWillMount() {
-		if (this.state.types.includes("MenuLauncher") && this.props.preSpawn) {
+		if (this.state.types.includes('MenuLauncher') && this.props.preSpawn) {
 			let self = this;
 			FSBL.Clients.DistributedStoreClient.createStore({
-				store: "Finsemble-Menu-Store",
+				store: 'Finsemble-Menu-Store',
 				global: true,
 				values: { creator: fin.desktop.Window.getCurrent().name }
 			}, function (err, store) {
@@ -1057,7 +1057,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 			{ onMouseUp: this.props.onMouseUp,
 				onMouseDown: this.props.onMouseDown,
 				onClick: this.onClick,
-				title: this.props.title || "",
+				title: this.props.title || '',
 				className: classes },
 			image,
 			label,
@@ -1079,7 +1079,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
@@ -1218,7 +1218,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
@@ -1248,7 +1248,7 @@ module.exports = canDefineProperty;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
@@ -1282,7 +1282,7 @@ module.exports = ReactCurrentOwner;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 function makeEmptyFunction(arg) {
@@ -1391,7 +1391,7 @@ module.exports = lowPriorityWarning;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
@@ -2081,7 +2081,7 @@ module.exports = emptyObject;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
@@ -2104,7 +2104,7 @@ module.exports = REACT_ELEMENT_TYPE;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
@@ -3370,7 +3370,7 @@ module.exports = ReactChildren;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
@@ -3666,7 +3666,7 @@ module.exports = traverseAllChildren;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
@@ -3992,7 +3992,7 @@ module.exports = checkReactTypeSpec;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
@@ -4021,7 +4021,7 @@ module.exports = ReactPropTypeLocationNames;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- *
+ * 
  */
 
 
