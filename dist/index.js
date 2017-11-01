@@ -2925,7 +2925,7 @@ class FinsembleMenuSection extends __WEBPACK_IMPORTED_MODULE_0_react___default.a
 		this.finWindow.getBounds(bounds => {
 			this.setState({
 				bounds: bounds
-			}, this.setSectionHeight);
+			}, this.applySectionHeight);
 		});
 	}
 
@@ -2944,20 +2944,19 @@ class FinsembleMenuSection extends __WEBPACK_IMPORTED_MODULE_0_react___default.a
 		}
 	}
 	getSectionHeight() {
+		let windowFillHeight = this.state.bounds.height - this.wrapperReference.offsetTop;
+		let sectionHeight = '100%';
 		if (this.props.scrollable && this.wrapperReference) {
 			//The maximum height is essentially the amount of real estate from the top of the element to the bottom of the window.
-			let sectionHeight = Array.from(this.wrapperReference.children).map(el => el.offsetHeight).reduce((accumulator, currentValue) => {
+			sectionHeight = Array.from(this.wrapperReference.children).map(el => el.offsetHeight).reduce((accumulator, currentValue) => {
 				return accumulator + currentValue;
 			}, 0);
-			let windowFillHeight = this.state.bounds.height - this.wrapperReference.offsetTop;
 
 			if (sectionHeight > windowFillHeight) {
 				sectionHeight = windowFillHeight;
 			}
-			// console.log('getting sectionHeight;num kids:', Array.from(this.wrapperReference.children).length);
-			return sectionHeight;
 		}
-		return '100%';
+		return sectionHeight;
 	}
 
 	render() {
