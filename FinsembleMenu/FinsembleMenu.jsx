@@ -177,9 +177,9 @@ export default class FinsembleMenu extends React.Component {
      * @memberof FinsembleMenu
      */
 	componentDidMount() {
-		if (this.props.padding) {
+		if (this.padding) {
 			FSBL.Clients.WindowClient.fitToDOM({
-				padding: this.props.padding
+				padding: this.padding
 			}, this.cacheBounds);
 		}
 	}

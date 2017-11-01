@@ -2634,9 +2634,9 @@ class FinsembleMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
      * @memberof FinsembleMenu
      */
 	componentDidMount() {
-		if (this.props.padding) {
+		if (this.padding) {
 			FSBL.Clients.WindowClient.fitToDOM({
-				padding: this.props.padding
+				padding: this.padding
 			}, this.cacheBounds);
 		}
 	}
@@ -2936,6 +2936,11 @@ class FinsembleMenuSection extends __WEBPACK_IMPORTED_MODULE_0_react___default.a
 		if (this.props.scrollable) {
 			//The maximum height is essentially the amount of real estate from the top of the element to the bottom of the window.
 			let maxHeight = this.state.bounds.height - this.wrapperReference.offsetTop;
+			debugger; //eslint-disable-line
+			if (this.wrapperReference.offsetHeight < this.state.maxHeight) {
+				maxHeight = this.wrapperReference.offsetHeight;
+			}
+
 			this.setState({
 				maxHeight: maxHeight
 			});

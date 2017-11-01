@@ -45,7 +45,6 @@ export default class FinsembleMenuSection extends React.Component {
 		});
 	}
 
-
 	onWindowShown() {
 		this.finWindow.focus();
 	}
@@ -54,6 +53,11 @@ export default class FinsembleMenuSection extends React.Component {
 		if(this.props.scrollable){
 			//The maximum height is essentially the amount of real estate from the top of the element to the bottom of the window.
 			let maxHeight = this.state.bounds.height - this.wrapperReference.offsetTop;
+
+			if (this.wrapperReference.offsetHeight < this.state.maxHeight) {
+				maxHeight = this.wrapperReference.offsetHeight;
+			}
+
 			this.setState({
 				maxHeight: maxHeight
 			});
