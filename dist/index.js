@@ -6187,7 +6187,8 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 					buttonType: ["Toolbar", "MenuLauncher"],
 					menuType: "Overflow Menu",
 					title: "Overflow",
-					fontIcon: "ff-caret-down"
+					fontIcon: "ff-caret-down",
+					preSpawn: true
 				};
 			}
 
@@ -6196,12 +6197,6 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 			// create/get a store for checking if overflowmenu has been spawned. If not, spawn
 			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
 				self.setState({ overflowStore: store });
-				store.getValue({ field: 'menuSpawned' }, function (err, menuSpawned) {
-					if (!menuSpawned) {
-						self.spawnMenu(self.state.overflowMenuProps);
-					}
-					store.setValue({ field: 'menuSpawned', value: true });
-				});
 			});
 
 			// listener for overflow clicks
