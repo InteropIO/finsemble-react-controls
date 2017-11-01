@@ -60,6 +60,9 @@ export default class FinsembleMenuSection extends React.Component {
 			this.wrapperReference.setAttribute('style', `height:${this.getSectionHeight()}px`);
 		}
 	}
+	/**
+	 * If the section is larger than the space allowed in the window, we cap it off to create a scrollbar.
+	 */
 	getSectionHeight() {
 		let windowFillHeight = this.state.bounds.height - this.wrapperReference.offsetTop;
 		let sectionHeight = '100%';
