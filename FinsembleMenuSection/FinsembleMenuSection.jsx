@@ -14,7 +14,8 @@ export default class FinsembleMenuSection extends React.Component {
 			bounds: {
 				height: 0
 			},
-			maxHeight: typeof props.maxHeight !== undefined? props.maxHeight : '100%'
+			sectionHeight: 0,
+			maxHeight: typeof props.maxHeight !== undefined ? props.maxHeight : '100%'
 		};
 		this.wrapperReference = null;
 		this.bindCorrectContext();
@@ -25,15 +26,14 @@ export default class FinsembleMenuSection extends React.Component {
 	bindCorrectContext() {
 		this.onBoundsChanged = this.onBoundsChanged.bind(this);
 		this.onWindowShown = this.onWindowShown.bind(this);
-		this.setMaxHeight = this.setMaxHeight.bind(this);
-
+		this.applySectionHeight = this.applySectionHeight.bind(this);
 	}
 
-	componentWillMount(){
+	componentWillMount() {
 		window.addEventListener('resize', this.onBoundsChanged);
 	}
 
-	componentWillUnmount(){
+	componentWillUnmount() {
 		window.removeEventListener('resize', this.onBoundsChanged);
 	}
 
@@ -41,44 +41,45 @@ export default class FinsembleMenuSection extends React.Component {
 		this.finWindow.getBounds((bounds) => {
 			this.setState({
 				bounds: bounds
-			}, this.setMaxHeight);
+			}, this.setSectionHeight);
 		});
 	}
 
 	onWindowShown() {
 		this.finWindow.focus();
 	}
+	componentDidUpdate() {
+		this.applySectionHeight();
+	}
+	componentDidMount() {
+		this.applySectionHeight();
 
-	setMaxHeight() {
-		if(this.props.scrollable){
-			//The maximum height is essentially the amount of real estate from the top of the element to the bottom of the window.
-			let maxHeight = this.state.bounds.height - this.wrapperReference.offsetTop;
-
-			if (this.wrapperReference.offsetHeight < this.state.maxHeight) {
-				maxHeight = this.wrapperReference.offsetHeight;
-			}
-
-			this.setState({
-				maxHeight: maxHeight
-			});
+	}
+	applySectionHeight() {
+		if (this.wrapperReference) {
+			this.wrapperReference.setAttribute('style', `height:${this.getSectionHeight()}px`);
 		}
+	}
+	getSectionHeight() {
+		if (this.props.scrollable && this.wrapperReference) {
+			let windowFillHeight = this.state.bounds.height - this.wrapperReference.offsetTop;
+			return windowFillHeight;
+		}
+		return '100%';
 	}
 
 	render() {
-		let styles = {
-			height: this.state.maxHeight
-		};
 
 		let classes = this.props.className || SECTION_BASE_CLASS;
 		if (classes !== SECTION_BASE_CLASS) {
 			//If you're unfamiliar with this syntax, it's equivalent to
-		    //classes+=' ' + SECTION_BASE_CLASS;
-			classes +=  ` ${SECTION_BASE_CLASS}`;
+			//classes+=' ' + SECTION_BASE_CLASS;
+			classes += ` ${SECTION_BASE_CLASS}`;
 		}
 
-		return (<div  ref={(el) => {
+		return (<div ref={(el) => {
 			this.wrapperReference = el;
-		}}  {...this.props} style={styles} className={classes}>
+		}}  {...this.props} className={classes}>
 			{this.props.children}
 		</div>);
 
