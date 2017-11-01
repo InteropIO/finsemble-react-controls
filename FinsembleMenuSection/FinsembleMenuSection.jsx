@@ -62,8 +62,17 @@ export default class FinsembleMenuSection extends React.Component {
 	}
 	getSectionHeight() {
 		if (this.props.scrollable && this.wrapperReference) {
+			//The maximum height is essentially the amount of real estate from the top of the element to the bottom of the window.
+			let sectionHeight = Array.from(this.wrapperReference.children)
+				.map(el => el.offsetHeight)
+				.reduce((accumulator, currentValue) => { return accumulator + currentValue; }, 0);
 			let windowFillHeight = this.state.bounds.height - this.wrapperReference.offsetTop;
-			return windowFillHeight;
+
+
+			if (sectionHeight > windowFillHeight) {
+				sectionHeight = windowFillHeight;
+			}
+			return sectionHeight;
 		}
 		return '100%';
 	}

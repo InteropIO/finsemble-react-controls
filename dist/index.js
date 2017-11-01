@@ -2946,20 +2946,16 @@ class FinsembleMenuSection extends __WEBPACK_IMPORTED_MODULE_0_react___default.a
 	getSectionHeight() {
 		if (this.props.scrollable && this.wrapperReference) {
 			//The maximum height is essentially the amount of real estate from the top of the element to the bottom of the window.
-			// let sectionHeight = Array.from(this.wrapperReference.children)
-			// 	.map(el => el.offsetHeight)
-			// 	.reduce((accumulator, currentValue) => { return accumulator + currentValue; }, 0);
+			let sectionHeight = Array.from(this.wrapperReference.children).map(el => el.offsetHeight).reduce((accumulator, currentValue) => {
+				return accumulator + currentValue;
+			}, 0);
 			let windowFillHeight = this.state.bounds.height - this.wrapperReference.offsetTop;
-			return windowFillHeight;
-			// let maxAllowedHeight = isNaN(this.state.maxHeight) ? Infinity : this.state.maxHeight;
 
-			// if (sectionHeight > maxAllowedHeight) {
-			// 	sectionHeight = maxAllowedHeight;
-			// } else if (sectionHeight < windowFillHeight) {
-			// 	sectionHeight = windowFillHeight;
-			// }
+			if (sectionHeight > windowFillHeight) {
+				sectionHeight = windowFillHeight;
+			}
 			// console.log('getting sectionHeight;num kids:', Array.from(this.wrapperReference.children).length);
-			// return sectionHeight;
+			return sectionHeight;
 		}
 		return '100%';
 	}
