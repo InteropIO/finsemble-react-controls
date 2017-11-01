@@ -6,7 +6,7 @@ The FinsembleOverflowMenu component is designed to automatically handle overflow
 ## Props
 | Prop         	|  Type         | Possible values | Default value | Description 	|
 |--------------	|--------------	|-------------	  | ------------- | -------------	|
-| overflowMenuStore        	| string        |  |  | The name of the Global DataStore created using the DataStoreClient used to send this a list of overflow items.         	|
+| overflowMenuStore        	| string        |  |  | The name of the Global DataStore created using the DistributedStoreClient used to send this a list of overflow items.         	|
 
 ## overflowMenuStore
 The store passed to overflowMenu must contain

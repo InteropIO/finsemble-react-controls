@@ -957,7 +957,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	componentWillMount() {
 		if (this.state.types.includes("MenuLauncher") && this.props.preSpawn) {
 			let self = this;
-			FSBL.Clients.DataStoreClient.createStore({
+			FSBL.Clients.DistributedStoreClient.createStore({
 				store: "Finsemble-Menu-Store",
 				global: true,
 				values: { creator: fin.desktop.Window.getCurrent().name }
@@ -1079,7 +1079,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -1218,7 +1218,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -1248,7 +1248,7 @@ module.exports = canDefineProperty;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -1282,7 +1282,7 @@ module.exports = ReactCurrentOwner;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 function makeEmptyFunction(arg) {
@@ -1391,7 +1391,7 @@ module.exports = lowPriorityWarning;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -2081,7 +2081,7 @@ module.exports = emptyObject;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -2104,7 +2104,7 @@ module.exports = REACT_ELEMENT_TYPE;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -3370,7 +3370,7 @@ module.exports = ReactChildren;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -3666,7 +3666,7 @@ module.exports = traverseAllChildren;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -3992,7 +3992,7 @@ module.exports = checkReactTypeSpec;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -4021,7 +4021,7 @@ module.exports = ReactPropTypeLocationNames;
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * 
+ *
  */
 
 
@@ -5689,10 +5689,6 @@ class FinsembleDialog extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Comp
 		FSBL.Clients.DialogManager.userInputTimeout = this.state.userInputTimeout;
 		FSBL.Clients.DialogManager.isModal = this.props.isModal;
 
-		if (this.props.isModal) {
-			this.finWindow.addEventListener('shown', FSBL.Clients.DialogManager.showModal);
-		}
-
 		this.addResponder();
 
 		document.body.addEventListener('keydown', this.handleKeyDown);
@@ -5749,6 +5745,15 @@ class FinsembleDialog extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Comp
 	componentDidMount() {
 		//DialogManager uses this when it sends its response back to the originating window. After that response is sent, we either hide or close the dialog.
 		FSBL.Clients.DialogManager.behaviorOnResponse = this.state.behaviorOnResponse;
+		if (this.props.isModal) {
+			this.finWindow.addEventListener('shown', FSBL.Clients.DialogManager.showModal);
+		}
+	}
+
+	componentDidUnmount() {
+		if (this.props.isModal) {
+			this.finWindow.removeEventListener('shown', FSBL.Clients.DialogManager.showModal);
+		}
 	}
 
 	addResponder() {
@@ -5967,7 +5972,7 @@ class FinsembleOverflowMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.
 
 	componentWillMount() {
 		var self = this;
-		FSBL.Clients.DataStoreClient.createStore({ store: this.props.overflowMenuStore, global: true }, function (err, store) {
+		FSBL.Clients.DistributedStoreClient.createStore({ store: this.props.overflowMenuStore, global: true }, function (err, store) {
 			self.setState({ store: store });
 			store.getValue('buttons', function (err, response) {});
 
@@ -6189,7 +6194,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 			var overflowMenuStoreName = this.props.overflowMenuStoreName || "OverflowMenuStore";
 
 			// create/get a store for checking if overflowmenu has been spawned. If not, spawn
-			FSBL.Clients.DataStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
+			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
 				self.setState({ overflowStore: store });
 				store.getValue({ field: 'menuSpawned' }, function (err, menuSpawned) {
 					if (!menuSpawned) {
@@ -6206,7 +6211,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 		}
 
 		if (this.props.handlePins) {
-			FSBL.Clients.DataStoreClient.createStore({ global: true, store: 'Finsemble-Toolbar-Store' }, function (err, store) {
+			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: 'Finsemble-Toolbar-Store' }, function (err, store) {
 				// Load pins from storage
 				self.setState({ pinStore: store });
 				FSBL.Clients.StorageClient.get({ topic: "finsemble", key: "toolbarPins" }, function (err, pins) {

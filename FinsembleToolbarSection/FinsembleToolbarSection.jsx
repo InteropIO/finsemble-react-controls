@@ -125,7 +125,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			var overflowMenuStoreName = this.props.overflowMenuStoreName || "OverflowMenuStore";
 
 			// create/get a store for checking if overflowmenu has been spawned. If not, spawn
-			FSBL.Clients.DataStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
+			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
 				self.setState({ overflowStore: store });
 				store.getValue({ field: 'menuSpawned' }, function (err, menuSpawned) {
 					if (!menuSpawned) {
@@ -143,7 +143,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		}
 
 		if (this.props.handlePins) {
-			FSBL.Clients.DataStoreClient.createStore({ global: true, store: 'Finsemble-Toolbar-Store' }, function (err, store) {
+			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: 'Finsemble-Toolbar-Store' }, function (err, store) {
 				// Load pins from storage
 				self.setState({ pinStore: store });
 				FSBL.Clients.StorageClient.get({ topic: "finsemble", key: "toolbarPins" }, function (err, pins) {

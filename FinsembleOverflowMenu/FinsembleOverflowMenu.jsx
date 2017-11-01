@@ -35,7 +35,7 @@ export default class FinsembleOverflowMenu extends React.Component {
 
 	componentWillMount() {
 		var self = this;
-		FSBL.Clients.DataStoreClient.createStore({ store: this.props.overflowMenuStore, global: true }, function (err, store) {
+		FSBL.Clients.DistributedStoreClient.createStore({ store: this.props.overflowMenuStore, global: true }, function (err, store) {
 			self.setState({ store: store });
 			store.getValue('buttons', function (err, response) {
 
