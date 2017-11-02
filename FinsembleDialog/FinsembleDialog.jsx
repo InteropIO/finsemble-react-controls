@@ -84,7 +84,7 @@ export default class FinsembleDialog extends React.Component {
 		}
 	}
 
-	componentDidUnmount() {
+	componentWillUnmount() {
 		if (this.props.isModal) {
 			this.finWindow.removeEventListener('shown', FSBL.Clients.DialogManager.showModal);
 		}
