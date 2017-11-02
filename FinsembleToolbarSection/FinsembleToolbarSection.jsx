@@ -207,9 +207,10 @@ export default class FinsembleToolbarSection extends React.Component {
 					overflow.push({ item: self.children[i].props, index: i });
 				}
 			}
+			console.log(minOverflowIndex)
 			self.setState({
 				overflow: overflow,
-				minOverflowIndex: minOverflowIndex
+				minOverflowIndex: (overflow[0] ? overflow[0].index : minOverflowIndex)
 			});
 		}
 	}
