@@ -45,9 +45,11 @@ export default class FinsembleToolbarSection extends React.Component {
 			for (var i in pins) {
 				var pin = pins[i];
 				if (pin) {
+					// If the pin has no index, it is new
 					if (!pin.index) {
 						newPins.push(pin);
 					} else {
+						// If we already have a pin at that index, give it a new index
 						if (pinArray[pin.index]) {
 							pin.index = pinArray.length;
 							pinArray[pin.index] = pin;
@@ -81,7 +83,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			for (var i = 0; i < pinArray.length; i++) {
 				if (pinArray[i] && pinArray[i].toolbarSection == this.props.name) myPins.push(pinArray[i]);
 			}
-			this.setState({ pins: myPins });
+			this.setState({ pins: myPins, minOverflowIndex: 1000000 });
 			FSBL.Clients.StorageClient.save({ topic: "finsemble", key: "toolbarPins", value: pins });
 			this.state.pinStore.setValue({ field: 'pins', value: pins });
 			this.initialLoad = false;
@@ -195,9 +197,13 @@ export default class FinsembleToolbarSection extends React.Component {
 			var e = self.element;
 			var right = e.offsetLeft + e.offsetWidth - 40;
 			var overflow = [];
+			var minOverflowIndex = 10000000;
 			for (var i = 0; i < e.children.length; i++) {
 				var item = e.children[i];
 				if ((item.offsetLeft + item.offsetWidth) > right) {
+					minOverflowIndex = i;
+				}
+				if (i >= minOverflowIndex) {
 					overflow.push({ item: self.children[i].props, index: i });
 				}
 			}
