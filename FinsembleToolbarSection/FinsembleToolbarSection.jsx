@@ -180,7 +180,7 @@ export default class FinsembleToolbarSection extends React.Component {
      */
 	hasOverflow() {
 		var e = this.element;
-		return (e.offsetHeight < e.scrollHeight || e.offsetWidth < e.scrollWidth - 40);
+		return (e.offsetWidth < e.scrollWidth - 40);
 	}
 
 	/**
