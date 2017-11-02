@@ -190,10 +190,16 @@ export default class Button extends React.Component {
 
 		FSBL.Clients.LauncherClient.showWindow({
 			windowName: windowName,
-			componentType: this.props.menuType,
-		}, { spawnIfNotFound: true }, function (err, response) {
-			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.data);
-			return cb();
+			componentType: this.props.menuType
+		}, {
+			spawnIfNotFound: true,
+			data: self.props.customData
+
+		}, function (err, response) {
+			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.customData);
+			if (cb) {
+				return cb();
+			}
 		});
 	}
 	componentWillMount() {
@@ -209,9 +215,9 @@ export default class Button extends React.Component {
 					if (err) return console.error(err);
 					let isCreator = data.creator === fin.desktop.Window.getCurrent().name;
 					if (!isCreator) return;
-
 					//If this button didn't create the store don't do anything
 					if (!data || !data[self.props.menuType]) {// If the menu doesn't exist yet spawn it.
+						console.log('Prespawning.', self.props.menuType);
 						self.spawnMenu(function () {
 							if (!data) {
 								data = {};

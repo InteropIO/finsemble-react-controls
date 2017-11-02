@@ -949,9 +949,15 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		FSBL.Clients.LauncherClient.showWindow({
 			windowName: windowName,
 			componentType: this.props.menuType
-		}, { spawnIfNotFound: true }, function (err, response) {
-			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.data);
-			return cb();
+		}, {
+			spawnIfNotFound: true,
+			data: self.props.customData
+
+		}, function (err, response) {
+			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.customData);
+			if (cb) {
+				return cb();
+			}
 		});
 	}
 	componentWillMount() {
@@ -967,10 +973,10 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 					if (err) return console.error(err);
 					let isCreator = data.creator === fin.desktop.Window.getCurrent().name;
 					if (!isCreator) return;
-
 					//If this button didn't create the store don't do anything
 					if (!data || !data[self.props.menuType]) {
 						// If the menu doesn't exist yet spawn it.
+						console.log('Prespawning.', self.props.menuType);
 						self.spawnMenu(function () {
 							if (!data) {
 								data = {};
@@ -5767,7 +5773,7 @@ class FinsembleDialog extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Comp
 		}
 	}
 
-	componentDidUnmount() {
+	componentWillUnmount() {
 		if (this.props.isModal) {
 			this.finWindow.removeEventListener('shown', FSBL.Clients.DialogManager.showModal);
 		}
@@ -6291,9 +6297,10 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 					overflow.push({ item: self.children[i].props, index: i });
 				}
 			}
+			console.log(minOverflowIndex);
 			self.setState({
 				overflow: overflow,
-				minOverflowIndex: overflow[0].index
+				minOverflowIndex: overflow[0] ? overflow[0].index : minOverflowIndex
 			});
 		}
 	}
