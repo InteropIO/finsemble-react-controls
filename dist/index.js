@@ -929,7 +929,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	}
 
 	launchComponent(e) {
-		FSBL.Clients.LauncherClient.spawn(this.props.component, { addToWorkspace: true }, { monitor: 'mine' });
+		FSBL.Clients.LauncherClient.spawn(this.props.component, { addToWorkspace: true, monitor: 'mine' });
 	}
 
 	/**
@@ -6270,7 +6270,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
      */
 	hasOverflow() {
 		var e = this.element;
-		return e.offsetHeight < e.scrollHeight || e.offsetWidth < e.scrollWidth - 40;
+		return e.offsetWidth < e.scrollWidth - 40;
 	}
 
 	/**
