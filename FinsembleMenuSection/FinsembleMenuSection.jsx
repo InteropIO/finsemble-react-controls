@@ -89,10 +89,9 @@ export default class FinsembleMenuSection extends React.Component {
 			//classes+=' ' + SECTION_BASE_CLASS;
 			classes += ` ${SECTION_BASE_CLASS}`;
 		}
-
 		return (<div ref={(el) => {
 			this.wrapperReference = el;
-		}}  {...this.props} className={classes}>
+		}} className={classes}>
 			{this.props.children}
 		</div>);
 

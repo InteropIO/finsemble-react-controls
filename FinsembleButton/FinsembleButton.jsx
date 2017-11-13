@@ -183,6 +183,17 @@ export default class Button extends React.Component {
 	warn(msg) {
 		console.warn(msg);
 	}
+	/**
+	 * Warns that no
+	 */
+	warnNoClick() {
+		this.warn('No onclick property passed to the Finsemble Button component.');
+	}
+
+	/**
+	 * Spawns menus
+	 * @param {*} cb
+	 */
 	spawnMenu(cb) {
 		let self = this;
 		let windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
@@ -236,8 +247,7 @@ export default class Button extends React.Component {
 			return null;
 		}
 		//If we don't receive an onClick prop, we will throw a warning to the console.
-		let warnNoOnClick = this.warn.bind(this, 'No onclick property passed to the Finsemble Button component.');
-		this._onClick = this.props.onClick || warnNoOnClick;
+		this._onClick = typeof this.props.onClick !== 'undefined' ? this.props.onClick : this.warnNoClick;
 
 		//Some intitial setup/defaults setting.
 		let self = this,
@@ -246,11 +256,12 @@ export default class Button extends React.Component {
 			iconPosition = this.props.iconPosition || 'left',
 			iconClasses = this.props.iconClasses || '',
 			classes = this.props.className || '',
-			types = this.props.buttonType || [];
+			types = this.props.buttonType || [],
+			draggable = typeof this.props.draggable !== 'undefined' ? this.props.draggable : false;
 
 		//Render icon.
 		if (this.props.icon) {
-			image = (<img className={iconClasses} src={this.props.icon} />);
+			image = (<img draggable={draggable} className={iconClasses} src={this.props.icon} />);
 		}
 		//coerce to array.
 		if (typeof types === 'string') {

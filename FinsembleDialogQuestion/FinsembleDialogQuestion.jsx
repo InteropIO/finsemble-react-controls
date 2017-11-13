@@ -15,7 +15,9 @@ export default class FinsembleDialogQuestion extends React.Component {
 		//If you're unfamiliar with this syntax, it's equivalent to
 		//classes+=' ' + DIALOG_QUESTION_BASE_CLASS;
 		classes += ` ${DIALOG_QUESTION_BASE_CLASS}`;
-		return (<div {...this.props} className={classes}>
+		let props = this.props;
+
+		return (<div className={classes}>
 			{this.props.question}
 			{this.props.children}
 		</div>);

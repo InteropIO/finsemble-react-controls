@@ -941,6 +941,17 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	warn(msg) {
 		console.warn(msg);
 	}
+	/**
+  * Warns that no
+  */
+	warnNoClick() {
+		this.warn('No onclick property passed to the Finsemble Button component.');
+	}
+
+	/**
+  * Spawns menus
+  * @param {*} cb
+  */
 	spawnMenu(cb) {
 		let self = this;
 		let windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
@@ -995,8 +1006,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 			return null;
 		}
 		//If we don't receive an onClick prop, we will throw a warning to the console.
-		let warnNoOnClick = this.warn.bind(this, 'No onclick property passed to the Finsemble Button component.');
-		this._onClick = this.props.onClick || warnNoOnClick;
+		this._onClick = typeof this.props.onClick !== 'undefined' ? this.props.onClick : this.warnNoClick;
 
 		//Some intitial setup/defaults setting.
 		let self = this,
@@ -1005,11 +1015,12 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		    iconPosition = this.props.iconPosition || 'left',
 		    iconClasses = this.props.iconClasses || '',
 		    classes = this.props.className || '',
-		    types = this.props.buttonType || [];
+		    types = this.props.buttonType || [],
+		    draggable = typeof this.props.draggable !== 'undefined' ? this.props.draggable : false;
 
 		//Render icon.
 		if (this.props.icon) {
-			image = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { className: iconClasses, src: this.props.icon });
+			image = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { draggable: draggable, className: iconClasses, src: this.props.icon });
 		}
 		//coerce to array.
 		if (typeof types === 'string') {
@@ -2722,6 +2733,16 @@ class FinsembleMenuItem extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 		    label = null,
 		    actionItems = [];
 
+		//add the trashcan icon.
+		if (this.props.isDeletable) {
+			this.validateProp('deleteAction');
+			actionItems.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_3__FinsembleMenuItemAction_FinsembleMenuItemAction__["a" /* default */],
+				{ key: 'delete', onClick: this.props.deleteAction },
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__FinsembleFontIcon_FinsembleFontIcon__["a" /* default */], { icon: 'ff-delete' })
+			));
+		}
+
 		//add the pin icon.
 		if (this.props.isPinnable) {
 			this.validateProps(['pinAction', 'isPinned']);
@@ -2729,18 +2750,8 @@ class FinsembleMenuItem extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 			let pinIcon = this.props.isPinned ? 'ff-pin finsemble-item-pinned' : 'ff-pin';
 			actionItems.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				__WEBPACK_IMPORTED_MODULE_3__FinsembleMenuItemAction_FinsembleMenuItemAction__["a" /* default */],
-				{ onClick: this.props.pinAction },
+				{ key: 'pin', onClick: this.props.pinAction },
 				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__FinsembleFontIcon_FinsembleFontIcon__["a" /* default */], { icon: pinIcon })
-			));
-		}
-
-		//add the trashcan icon.
-		if (this.props.isDeletable) {
-			this.validateProp('deleteAction');
-			actionItems.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-				__WEBPACK_IMPORTED_MODULE_3__FinsembleMenuItemAction_FinsembleMenuItemAction__["a" /* default */],
-				{ onClick: this.props.deleteAction },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__FinsembleFontIcon_FinsembleFontIcon__["a" /* default */], { icon: 'ff-delete' })
 			));
 		}
 
@@ -2886,8 +2897,6 @@ class FinsembleMenuItemAction extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 /*!
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
@@ -2976,12 +2985,11 @@ class FinsembleMenuSection extends __WEBPACK_IMPORTED_MODULE_0_react___default.a
 			//classes+=' ' + SECTION_BASE_CLASS;
 			classes += ` ${SECTION_BASE_CLASS}`;
 		}
-
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
-			_extends({ ref: el => {
+			{ ref: el => {
 					this.wrapperReference = el;
-				} }, this.props, { className: classes }),
+				}, className: classes },
 			this.props.children
 		);
 	}
@@ -5843,8 +5851,6 @@ class FinsembleDialogButton extends __WEBPACK_IMPORTED_MODULE_0_react___default.
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 /*!
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
@@ -5862,9 +5868,11 @@ class FinsembleDialogQuestion extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
 		//If you're unfamiliar with this syntax, it's equivalent to
 		//classes+=' ' + DIALOG_QUESTION_BASE_CLASS;
 		classes += ` ${DIALOG_QUESTION_BASE_CLASS}`;
+		let props = this.props;
+
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
-			_extends({}, this.props, { className: classes }),
+			{ className: classes },
 			this.props.question,
 			this.props.children
 		);
