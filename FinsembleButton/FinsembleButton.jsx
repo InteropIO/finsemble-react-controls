@@ -278,7 +278,11 @@ export default class Button extends React.Component {
 
 		//Render label.
 		if (this.props.label) {
-			label = <ButtonLabel align={iconPosition === 'left' ? 'right' : 'left'} label={this.props.label} />;
+			let buttonClasses = '';
+			if (types.includes('Toolbar')) {
+				buttonClasses += 'finsemble-toolbar-button-label';
+			}
+			label = <ButtonLabel className={buttonClasses} align={iconPosition === 'left' ? 'right' : 'left'} label={this.props.label} />;
 		}
 
 

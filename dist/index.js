@@ -1037,7 +1037,11 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
 		//Render label.
 		if (this.props.label) {
-			label = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__FinsembleButtonLabel_FinsembleButtonLabel__["a" /* default */], { align: iconPosition === 'left' ? 'right' : 'left', label: this.props.label });
+			let buttonClasses = '';
+			if (types.includes('Toolbar')) {
+				buttonClasses += 'finsemble-toolbar-button-label';
+			}
+			label = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__FinsembleButtonLabel_FinsembleButtonLabel__["a" /* default */], { className: buttonClasses, align: iconPosition === 'left' ? 'right' : 'left', label: this.props.label });
 		}
 
 		if (types.length) {
@@ -2444,7 +2448,7 @@ module.exports = ReactPropTypesSecret;
 * All rights reserved.
 */
 
-const BUTTON_BASE_CLASS = 'finsemble-toolbar-button-label';
+const BUTTON_BASE_CLASS = 'finsemble-button-label';
 class FinsembleButtonLabel extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 	constructor(props) {
 		super(props);
@@ -2454,8 +2458,8 @@ class FinsembleButtonLabel extends __WEBPACK_IMPORTED_MODULE_0_react___default.a
 		let classes = this.props.className || '';
 		let align = this.props.align || 'left';
 		let alignClassMap = {
-			'left': 'toolbar-button-label-left',
-			'right': 'toolbar-button-label-right'
+			'left': 'finsemble-button-label-left',
+			'right': 'finsemble-button-label-right'
 		};
 		let labelClass = alignClassMap[align];
 
