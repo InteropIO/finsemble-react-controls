@@ -3,7 +3,7 @@
 * All rights reserved.
 */
 import React from 'react';
-const BUTTON_BASE_CLASS = 'finsemble-toolbar-button-label';
+const BUTTON_BASE_CLASS = 'finsemble-button-label';
 export default class FinsembleButtonLabel extends React.Component {
 	constructor(props) {
 		super(props);
@@ -13,8 +13,8 @@ export default class FinsembleButtonLabel extends React.Component {
 		let classes = this.props.className || '';
 		let align = this.props.align || 'left';
 		let alignClassMap = {
-			'left': 'toolbar-button-label-left',
-			'right': 'toolbar-button-label-right'
+			'left': 'finsemble-button-label-left',
+			'right': 'finsemble-button-label-right'
 		};
 		let labelClass = alignClassMap[align];
 
