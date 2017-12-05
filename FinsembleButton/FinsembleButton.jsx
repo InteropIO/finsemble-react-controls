@@ -56,11 +56,18 @@ export default class Button extends React.Component {
 		this.bindCorrectContext();
 		this.finWindow = fin.desktop.Window.getCurrent();
 		//Used by menuLaunchers. see `this.launchMenu` for more.
+
 		this.openMenuOnClick = true;
 		var types = this.props.buttonType || [];
 		//coerce to array.
 		if (typeof types === 'string') {
 			types = [types];
+		}
+		if (!window.FSBLBUTTONS) {
+			window.FSBLBUTTONS = [];
+			window.FSBLBUTTONS.push(this);
+		} else {
+			window.FSBLBUTTONS.push(this);
 		}
 		this.state = {
 			types: types
@@ -112,9 +119,11 @@ export default class Button extends React.Component {
 	 * @memberof Button
 	 */
 	launchMenu(e) {
+		console.log('LaunchMenu Before processing', this.openMenuOnClick);
 		//If the click action has been invalidated (because the user clicked the menu Launcher while the menu was open), we allow subsequent clicks to open the menu.
 		if (!this.openMenuOnClick) {
 			this.openMenuOnClick = true;
+			console.log('LaunchMenu ShortCircuit.', this.openMenuOnClick);
 			return;
 		}
 		let self = this;
@@ -151,6 +160,7 @@ export default class Button extends React.Component {
 						}
 
 						self.openMenuOnClick = openMenuOnClick;
+						console.log('LaunchMenu Post Blur', self.openMenuOnClick, boundingBox, position);
 					});
 					finWindow.removeEventListener('blurred', onMenuBlurred);
 				};
@@ -163,7 +173,14 @@ export default class Button extends React.Component {
 		};
 
 		//Display the menu.
-		let windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : '');
+		let windowName;
+		if (self.props.menuWindowName) {
+			windowName = self.props.menuWindowName;
+		} else {
+			windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : '');
+		}
+
+		console.log('Showing window...', windowName);
 		FSBL.Clients.LauncherClient.showWindow({
 			windowName: windowName,
 			componentType: self.props.menuType
