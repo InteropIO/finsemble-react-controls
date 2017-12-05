@@ -63,12 +63,7 @@ export default class Button extends React.Component {
 		if (typeof types === 'string') {
 			types = [types];
 		}
-		if (!window.FSBLBUTTONS) {
-			window.FSBLBUTTONS = [];
-			window.FSBLBUTTONS.push(this);
-		} else {
-			window.FSBLBUTTONS.push(this);
-		}
+
 		this.state = {
 			types: types
 		};
@@ -119,11 +114,9 @@ export default class Button extends React.Component {
 	 * @memberof Button
 	 */
 	launchMenu(e) {
-		console.log('LaunchMenu Before processing', this.openMenuOnClick);
 		//If the click action has been invalidated (because the user clicked the menu Launcher while the menu was open), we allow subsequent clicks to open the menu.
 		if (!this.openMenuOnClick) {
 			this.openMenuOnClick = true;
-			console.log('LaunchMenu ShortCircuit.', this.openMenuOnClick);
 			return;
 		}
 		let self = this;
@@ -180,7 +173,6 @@ export default class Button extends React.Component {
 			windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : '');
 		}
 
-		console.log('Showing window...', windowName);
 		FSBL.Clients.LauncherClient.showWindow({
 			windowName: windowName,
 			componentType: self.props.menuType
