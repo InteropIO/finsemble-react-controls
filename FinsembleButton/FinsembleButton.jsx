@@ -205,7 +205,12 @@ export default class Button extends React.Component {
 	 */
 	spawnMenu(cb) {
 		let self = this;
-		let windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
+		let windowName;
+		if (this.props.menuWindowName) {
+			windowName = this.props.menuWindowName;
+		} else {
+			windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
+		}
 		const COMPONENT_UPDATE_CHANNEL = `${windowName}.ComponentsToRender`;
 
 		FSBL.Clients.LauncherClient.showWindow({

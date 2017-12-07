@@ -821,12 +821,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		if (typeof types === 'string') {
 			types = [types];
 		}
-		if (!window.FSBLBUTTONS) {
-			window.FSBLBUTTONS = [];
-			window.FSBLBUTTONS.push(this);
-		} else {
-			window.FSBLBUTTONS.push(this);
-		}
+
 		this.state = {
 			types: types
 		};
@@ -877,11 +872,9 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
   * @memberof Button
   */
 	launchMenu(e) {
-		console.log('LaunchMenu Before processing', this.openMenuOnClick);
 		//If the click action has been invalidated (because the user clicked the menu Launcher while the menu was open), we allow subsequent clicks to open the menu.
 		if (!this.openMenuOnClick) {
 			this.openMenuOnClick = true;
-			console.log('LaunchMenu ShortCircuit.', this.openMenuOnClick);
 			return;
 		}
 		let self = this;
@@ -938,7 +931,6 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 			windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : '');
 		}
 
-		console.log('Showing window...', windowName);
 		FSBL.Clients.LauncherClient.showWindow({
 			windowName: windowName,
 			componentType: self.props.menuType
@@ -971,7 +963,12 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
   */
 	spawnMenu(cb) {
 		let self = this;
-		let windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
+		let windowName;
+		if (this.props.menuWindowName) {
+			windowName = this.props.menuWindowName;
+		} else {
+			windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
+		}
 		const COMPONENT_UPDATE_CHANNEL = `${windowName}.ComponentsToRender`;
 
 		FSBL.Clients.LauncherClient.showWindow({
