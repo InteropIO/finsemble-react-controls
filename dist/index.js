@@ -2946,7 +2946,7 @@ class FinsembleMenuSection extends __WEBPACK_IMPORTED_MODULE_0_react___default.a
 	}
 	applySectionHeight() {
 		if (this.wrapperReference) {
-			this.wrapperReference.setAttribute('style', `height:${this.getSectionHeight()}px`);
+			this.wrapperReference.setAttribute('style', `height:${this.getSectionHeight()}`);
 		}
 	}
 	/**
@@ -6270,7 +6270,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_0_react___defaul
      */
 	hasOverflow() {
 		var e = this.element;
-		return e.offsetHeight < e.scrollHeight || e.offsetWidth < e.scrollWidth - 40;
+		return e.offsetWidth < e.scrollWidth - 40;
 	}
 
 	/**
