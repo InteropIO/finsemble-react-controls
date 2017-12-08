@@ -49,19 +49,20 @@ export default class FinsembleMenuItem extends React.Component {
 			label = null,
 			actionItems = [];
 
+		//add the trashcan icon.
+		if (this.props.isDeletable) {
+			this.validateProp('deleteAction');
+			actionItems.push(<FinsembleMenuItemAction key="delete" onClick={this.props.deleteAction}><FontIcon icon='ff-delete' /></FinsembleMenuItemAction>);
+		}
+
 		//add the pin icon.
 		if (this.props.isPinnable) {
 			this.validateProps(['pinAction', 'isPinned']);
 			//Add extra classes if the item is pinned.
 			let pinIcon = this.props.isPinned ? 'ff-pin finsemble-item-pinned' : 'ff-pin';
-			actionItems.push(<FinsembleMenuItemAction onClick={this.props.pinAction}><FontIcon icon={pinIcon} /></FinsembleMenuItemAction>);
+			actionItems.push(<FinsembleMenuItemAction key="pin" onClick={this.props.pinAction}><FontIcon icon={pinIcon} /></FinsembleMenuItemAction>);
 		}
 
-		//add the trashcan icon.
-		if (this.props.isDeletable) {
-			this.validateProp('deleteAction');
-			actionItems.push(<FinsembleMenuItemAction onClick={this.props.deleteAction}><FontIcon icon='ff-delete' /></FinsembleMenuItemAction>);
-		}
 
 		//If we have a pin or deelte button, put them in the wrapper.
 		if (actionItems.length) {

@@ -56,12 +56,14 @@ export default class Button extends React.Component {
 		this.bindCorrectContext();
 		this.finWindow = fin.desktop.Window.getCurrent();
 		//Used by menuLaunchers. see `this.launchMenu` for more.
+
 		this.openMenuOnClick = true;
 		var types = this.props.buttonType || [];
 		//coerce to array.
 		if (typeof types === 'string') {
 			types = [types];
 		}
+
 		this.state = {
 			types: types
 		};
@@ -151,6 +153,7 @@ export default class Button extends React.Component {
 						}
 
 						self.openMenuOnClick = openMenuOnClick;
+						console.log('LaunchMenu Post Blur', self.openMenuOnClick, boundingBox, position);
 					});
 					finWindow.removeEventListener('blurred', onMenuBlurred);
 				};
@@ -163,7 +166,13 @@ export default class Button extends React.Component {
 		};
 
 		//Display the menu.
-		let windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : '');
+		let windowName;
+		if (self.props.menuWindowName) {
+			windowName = self.props.menuWindowName;
+		} else {
+			windowName = self.props.menuType + (self.props.label ? self.props.label : self.props.tooltip ? self.props.tooltip : '');
+		}
+
 		FSBL.Clients.LauncherClient.showWindow({
 			windowName: windowName,
 			componentType: self.props.menuType
@@ -171,7 +180,7 @@ export default class Button extends React.Component {
 	}
 
 	launchComponent(e) {
-		FSBL.Clients.LauncherClient.spawn(this.props.component, { addToWorkspace: true }, { monitor: 'mine' });
+		FSBL.Clients.LauncherClient.spawn(this.props.component, { addToWorkspace: true, monitor: 'mine' });
 	}
 
 	/**
@@ -183,9 +192,25 @@ export default class Button extends React.Component {
 	warn(msg) {
 		console.warn(msg);
 	}
+	/**
+	 * Warns that no
+	 */
+	warnNoClick() {
+		this.warn('No onclick property passed to the Finsemble Button component.');
+	}
+
+	/**
+	 * Spawns menus
+	 * @param {*} cb
+	 */
 	spawnMenu(cb) {
 		let self = this;
-		let windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
+		let windowName;
+		if (this.props.menuWindowName) {
+			windowName = this.props.menuWindowName;
+		} else {
+			windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
+		}
 		const COMPONENT_UPDATE_CHANNEL = `${windowName}.ComponentsToRender`;
 
 		FSBL.Clients.LauncherClient.showWindow({
@@ -236,8 +261,7 @@ export default class Button extends React.Component {
 			return null;
 		}
 		//If we don't receive an onClick prop, we will throw a warning to the console.
-		let warnNoOnClick = this.warn.bind(this, 'No onclick property passed to the Finsemble Button component.');
-		this._onClick = this.props.onClick || warnNoOnClick;
+		this._onClick = typeof this.props.onClick !== 'undefined' ? this.props.onClick : this.warnNoClick;
 
 		//Some intitial setup/defaults setting.
 		let self = this,
@@ -246,11 +270,12 @@ export default class Button extends React.Component {
 			iconPosition = this.props.iconPosition || 'left',
 			iconClasses = this.props.iconClasses || '',
 			classes = this.props.className || '',
-			types = this.props.buttonType || [];
+			types = this.props.buttonType || [],
+			draggable = typeof this.props.draggable !== 'undefined' ? this.props.draggable : false;
 
 		//Render icon.
 		if (this.props.icon) {
-			image = (<img className={iconClasses} src={this.props.icon} />);
+			image = (<img draggable={draggable} className={iconClasses} src={this.props.icon} />);
 		}
 		//coerce to array.
 		if (typeof types === 'string') {
@@ -267,7 +292,11 @@ export default class Button extends React.Component {
 
 		//Render label.
 		if (this.props.label) {
-			label = <ButtonLabel align={iconPosition === 'left' ? 'right' : 'left'} label={this.props.label} />;
+			let buttonClasses = '';
+			if (types.includes('Toolbar')) {
+				buttonClasses += 'finsemble-toolbar-button-label';
+			}
+			label = <ButtonLabel className={buttonClasses} align={iconPosition === 'left' ? 'right' : 'left'} label={this.props.label} />;
 		}
 
 
