@@ -11,7 +11,7 @@ Currently, this has no props.
 
 ## Example
 
-See our sample [Toolbar component] (https://github.com/ChartIQ/finsemble-seed/tree/master/src/samples/toolbar) for a working example.
+See our sample [Toolbar component](https://github.com/ChartIQ/finsemble-seed/tree/master/src/samples/toolbar) for a working example.
 
 ```jsx
 <FinsembleToolbar>
