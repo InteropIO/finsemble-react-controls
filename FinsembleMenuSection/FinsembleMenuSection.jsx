@@ -57,7 +57,9 @@ export default class FinsembleMenuSection extends React.Component {
 	}
 	applySectionHeight() {
 		if (this.wrapperReference) {
-			this.wrapperReference.setAttribute('style', `height:${this.getSectionHeight()}`);
+			var height = this.getSectionHeight();
+			if(!isNaN(height)) height=height + 'px'
+			this.wrapperReference.setAttribute('style', `height:${height}`);
 		}
 	}
 	/**
