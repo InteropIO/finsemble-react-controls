@@ -2973,7 +2973,9 @@ class FinsembleMenuSection extends __WEBPACK_IMPORTED_MODULE_0_react___default.a
 	}
 	applySectionHeight() {
 		if (this.wrapperReference) {
-			this.wrapperReference.setAttribute('style', `height:${this.getSectionHeight()}`);
+			var height = this.getSectionHeight();
+			if (!isNaN(height)) height = height + 'px';
+			this.wrapperReference.setAttribute('style', `height:${height}`);
 		}
 	}
 	/**
