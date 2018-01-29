@@ -15,11 +15,13 @@
  *  It needs to render those buttons and when clicked, transmit the index of the clicked item back to the toolbar on the clickChannel
  *
  */
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import React from 'react';
 import FinsembleButton from '../FinsembleButton/FinsembleButton';
 const SECTION_BASE_CLASS = 'finsemble-toolbar-section';
 
+// Put the thing into the DOM!
 export default class FinsembleToolbarSection extends React.Component {
 	constructor(props) {
 		super(props);
@@ -36,7 +38,7 @@ export default class FinsembleToolbarSection extends React.Component {
 	// Process pin changes on the toolbar store
 	processPins(err, data) {
 		var pins = data.value;
-		if (!pins) { return }
+		if (!pins) { return; }
 		var pinArray = [];
 		var newPins = [];
 		var myPins = [];
@@ -83,8 +85,9 @@ export default class FinsembleToolbarSection extends React.Component {
 			for (var i = 0; i < pinArray.length; i++) {
 				if (pinArray[i] && pinArray[i].toolbarSection == this.props.name) myPins.push(pinArray[i]);
 			}
+
 			this.setState({ pins: myPins, minOverflowIndex: 1000000 });
-			FSBL.Clients.StorageClient.save({ topic: "finsemble", key: "toolbarPins", value: pins });
+			FSBL.Clients.StorageClient.save({ topic: 'finsemble', key: 'toolbarPins', value: pins });
 			this.state.pinStore.setValue({ field: 'pins', value: pins });
 			this.initialLoad = false;
 		}
@@ -117,15 +120,15 @@ export default class FinsembleToolbarSection extends React.Component {
 			} else {
 				this.state.overflowMenuComponent = FinsembleButton;
 				this.state.overflowMenuProps = {
-					buttonType: ["Toolbar", "MenuLauncher"],
-					menuType: "Overflow Menu",
-					title: "Overflow",
-					fontIcon: "ff-caret-down",
+					buttonType: ['Toolbar', 'MenuLauncher'],
+					menuType: 'Overflow Menu',
+					title: 'Overflow',
+					fontIcon: 'ff-caret-down',
 					preSpawn: true
 				};
 			}
 
-			var overflowMenuStoreName = this.props.overflowMenuStoreName || "OverflowMenuStore";
+			var overflowMenuStoreName = this.props.overflowMenuStoreName || 'OverflowMenuStore';
 
 			// create/get a store for checking if overflowmenu has been spawned. If not, spawn
 			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
@@ -143,8 +146,8 @@ export default class FinsembleToolbarSection extends React.Component {
 			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: 'Finsemble-Toolbar-Store' }, function (err, store) {
 				// Load pins from storage
 				self.setState({ pinStore: store });
-				FSBL.Clients.StorageClient.get({ topic: "finsemble", key: "toolbarPins" }, function (err, pins) {
-					store.setValue({ field: 'pins', value: pins })
+				FSBL.Clients.StorageClient.get({ topic: 'finsemble', key: 'toolbarPins' }, function (err, pins) {
+					store.setValue({ field: 'pins', value: pins });
 					self.initialLoad = true;
 				});
 				store.addListener({ field: 'pins' }, self.processPins);
@@ -207,7 +210,7 @@ export default class FinsembleToolbarSection extends React.Component {
 					overflow.push({ item: self.children[i].props, index: i });
 				}
 			}
-			console.log(minOverflowIndex)
+			console.log(minOverflowIndex);
 			self.setState({
 				overflow: overflow,
 				minOverflowIndex: (overflow[0] ? overflow[0].index : minOverflowIndex)
@@ -229,19 +232,38 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	renderpins() {
-		if (!this.state.pins) { return [] }
+		if (!this.state.pins) { return []; }
 		var components = [];
-		for (var i = 0; i < this.state.pins.length; i++) {
-			var pin = this.state.pins[i];
+		for (let i = 0; i < this.state.pins.length; i++) {
+			let pin = this.state.pins[i];
 			if (!pin) continue;
-			var Component = this.props.pinnableItems[pin.type];
+			let Component = this.props.pinnableItems[pin.type];
+			let cmp;
 			switch (pin.type) {
-				case 'componentLauncher':
-					components.push(<Component key={i} iconClasses="pinned-icon" buttonType={["AppLauncher", "Toolbar"]} {...pin} />);
-					break;
-				default:
-					components.push(<Component key={i} {...pin} />);
-					break;
+			case 'componentLauncher':
+				cmp = <Component key={i} iconClasses="pinned-icon" buttonType={['AppLauncher', 'Toolbar']} {...pin} />;
+				break;
+			default:
+				cmp = <Component key={i} {...pin} />;
+				break;
+			}
+			if (this.props.arrangeable) {
+				components.push(<Draggable key={i} draggableId={i} index={pin.index}>
+					{(provided, snapshot) => (
+						<div>
+							<div
+								ref={provided.innerRef}
+								{...provided.draggableProps}
+								{...provided.dragHandleProps}
+							>
+								{cmp}
+							</div>
+							{provided.placeholder}
+						</div>
+					)}
+				</Draggable>);
+			} else {
+				components.push(cmp);
 			}
 		}
 		return components;
@@ -274,6 +296,20 @@ export default class FinsembleToolbarSection extends React.Component {
 				}
 			})}
 		</div>);
-		return section;
+		if (this.props.arrangeable) {
+			return (<Droppable className={classes} direction="horizontal" droppableId="droppable">
+				{(provided, snapshot) => (
+					<div
+						ref={provided.innerRef}
+					>
+						{section}
+						{provided.placeholder}
+					</div>
+				)}
+			</Droppable>);
+		} else {
+			return section;
+		}
+
 	}
 }

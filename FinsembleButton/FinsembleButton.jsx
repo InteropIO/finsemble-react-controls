@@ -328,7 +328,6 @@ export default class Button extends React.Component {
 			if (self._onClick) self._onClick(e);
 			if (self.props.afterClick) self.props.afterClick(e);
 		};
-
 		return (<div onMouseUp={this.props.onMouseUp}
 			onMouseDown={this.props.onMouseDown}
 			onClick={this.onClick}

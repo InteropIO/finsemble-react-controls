@@ -4,6 +4,7 @@ module.exports = {
 	stats: {
 		warnings: true
 	},
+	watch: true,
 	module: {
 		rules: [
 			{
