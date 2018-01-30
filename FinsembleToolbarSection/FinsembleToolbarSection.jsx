@@ -137,6 +137,7 @@ export default class FinsembleToolbarSection extends React.Component {
 
 			// create/get a store for checking if overflowmenu has been spawned. If not, spawn
 			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
+
 				self.setState({ overflowStore: store });
 			});
 
@@ -200,7 +201,14 @@ export default class FinsembleToolbarSection extends React.Component {
 	componentDidUpdate() {
 		if (!this.props.handleOverflow) return;
 		var self = this;
-
+		function getComponentProps(cmp){
+			//if the component has children, we want the properties of the child..if not, we want the component's properties. the overflow menu needs those.
+			//@todo, do this better. give the cmp a unique id that we can grab from props or props.children...just traverse the tree until we find it.
+			if (cmp.props.children) {
+				return cmp.props.children.props;
+			}
+			return cmp.props;
+		}
 		if (self.hasOverflow()) {
 			var e = self.element;
 			var right = e.offsetLeft + e.offsetWidth - 40;
@@ -212,10 +220,10 @@ export default class FinsembleToolbarSection extends React.Component {
 					minOverflowIndex = i;
 				}
 				if (i >= minOverflowIndex) {
-					overflow.push({ item: self.children[i].props, index: i });
+					overflow.push({ item: getComponentProps(self.children[i]), index: i });
 				}
 			}
-			console.log(minOverflowIndex);
+			debugger //eslint-disable-line
 			self.setState({
 				overflow: overflow,
 				minOverflowIndex: (overflow[0] ? overflow[0].index : minOverflowIndex)
@@ -232,8 +240,19 @@ export default class FinsembleToolbarSection extends React.Component {
      * @memberof FinsembleToolbarSection
      */
 	saveButtonsToOverflowStore(e, self) {
+		debugger;//eslint-disable-line
 		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.state.clickChannel });
-		self.state.overflowStore.setValue({ field: 'buttons', value: self.state.overflow });
+		function makeButtonsSafeForRouter(overflow) {
+			return overflow.map((el) => {
+				delete el.item.children;
+				return el;
+			});
+		}
+		let buttons = makeButtonsSafeForRouter(self.state.overflow);
+		self.state.overflowStore.setValue({
+			field: 'buttons',
+			value: buttons
+		});
 	}
 
 	renderpins() {

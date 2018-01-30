@@ -22,6 +22,7 @@ export default class FinsembleOverflowMenu extends React.Component {
 	}
 
 	buttonChangeListener(err, response) {
+		debugger;//eslint-disable-line
 		if (response.value) {
 			this.setState({ buttons: response.value }, self.onStateChange);
 		}
@@ -36,6 +37,7 @@ export default class FinsembleOverflowMenu extends React.Component {
 	componentWillMount() {
 		var self = this;
 		FSBL.Clients.DistributedStoreClient.createStore({ store: this.props.overflowMenuStore, global: true }, function (err, store) {
+			debugger;//eslint-disable-line
 			self.setState({ store: store });
 			store.getValue('buttons', function (err, response) {
 
