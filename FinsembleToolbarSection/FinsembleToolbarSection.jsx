@@ -18,7 +18,6 @@
 import FinsembleDraggable from '../FinsembleDraggable/FinsembleDraggable';
 import FinsembleDroppable from '../FinsembleDroppable/FinsembleDroppable';
 
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import React from 'react';
 import FinsembleButton from '../FinsembleButton/FinsembleButton';
@@ -53,15 +52,17 @@ export default class FinsembleToolbarSection extends React.Component {
 				}
 				arr[pin.index] = pin;
 			}
-			return arr;
+			return arr.filter((el) => el !== null);
 		}
 		function pinsToObj(arr) {
 			let obj = {};
-			for (let i = 0; i < arr.length; i++) {
-				let key = arr[i].component;
-				obj[key] = arr[i];
-				obj[key].index = i;
-			}
+			arr.forEach((el, i) => {
+				if (el) {
+					let key = el.label;
+					obj[key] = el;
+					obj[key].index = i;
+				}
+			});
 			return obj;
 		}
 		let storedPins = this.state.pins,

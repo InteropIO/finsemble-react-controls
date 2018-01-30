@@ -12,7 +12,7 @@
 
 import React from 'react';
 const TOOLBAR_BASE_CLASS = 'finsemble-toolbar';
-import { DragDropContext } from 'react-beautiful-dnd';
+import FinsembleDnDContext from '../FinsembleDnDContext/FinsembleDnDContext';
 export default class FinsembleToolbar extends React.Component {
 	constructor(props) {
 		console.log('RENDERING SOON');
@@ -33,11 +33,11 @@ export default class FinsembleToolbar extends React.Component {
 
 		return (
 
-			<DragDropContext onDragEnd={this.onDragEnd}>
+			<FinsembleDnDContext onDragEnd={this.onDragEnd}>
 				<div className={classes}>
 					{this.props.children}
 				</div>
-			</DragDropContext>
+			</FinsembleDnDContext>
 
 		);
 	}

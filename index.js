@@ -16,7 +16,9 @@ import FinsembleOverflowMenu from './FinsembleOverflowMenu/FinsembleOverflowMenu
 import FinsembleToolbar from './FinsembleToolbar/FinsembleToolbar';
 import FinsembleToolbarSection from './FinsembleToolbarSection/FinsembleToolbarSection';
 import FinsembleToolbarSeparator from './FinsembleToolbarSeparator/FinsembleToolbarSeparator';
-
+import FinsembleDnDContext from './FinsembleDnDContext/FinsembleDnDContext';
+import FinsembleDraggable from './FinsembleDraggable/FinsembleDraggable';
+import FinsembleDroppable from './FinsembleDroppable/FinsembleDroppable';
 export {
 	FinsembleButton,
 	FinsembleButtonLabel,
@@ -35,5 +37,8 @@ export {
 	FinsembleOverflowMenu,
 	FinsembleToolbar,
 	FinsembleToolbarSection,
-	FinsembleToolbarSeparator
+	FinsembleToolbarSeparator,
+	FinsembleDnDContext,
+	FinsembleDraggable,
+	FinsembleDroppable
 };

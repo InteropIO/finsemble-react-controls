@@ -7,8 +7,10 @@ export default class FinsembleDroppable extends React.Component {
 		super(props);
 	}
 	render() {
+		let direction = this.props.direction || 'horizontal';
+		let droppableId = this.props.droppableId || 'droppable';
 		return (
-			<Droppable ignoreContainerClipping={true} direction="horizontal" droppableId="droppable">
+			<Droppable direction={direction} droppableId={droppableId}>
 				{(provided, snapshot) => (
 					<div className={this.props.classes}
 						ref={provided.innerRef}
