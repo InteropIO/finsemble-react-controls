@@ -15,6 +15,9 @@
  *  It needs to render those buttons and when clicked, transmit the index of the clicked item back to the toolbar on the clickChannel
  *
  */
+import FinsembleDraggable from '../FinsembleDraggable/FinsembleDraggable';
+import FinsembleDroppable from '../FinsembleDroppable/FinsembleDroppable';
+
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import React from 'react';
@@ -27,6 +30,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		super(props);
 		this.props = props;
 		this.state = {
+			pins: [],
 			clickChannel: this.props.clickChannel || FSBL.Clients.WindowClient.windowName + '-overflow-clickChannel'
 		};
 		var self = this;
@@ -37,58 +41,58 @@ export default class FinsembleToolbarSection extends React.Component {
 
 	// Process pin changes on the toolbar store
 	processPins(err, data) {
-		var pins = data.value;
-		if (!pins) { return; }
-		var pinArray = [];
-		var newPins = [];
-		var myPins = [];
-		var pinsChanged = false;
-		if (pins) {
-			for (var i in pins) {
-				var pin = pins[i];
-				if (pin) {
-					// If the pin has no index, it is new
-					if (!pin.index) {
-						newPins.push(pin);
-					} else {
-						// If we already have a pin at that index, give it a new index
-						if (pinArray[pin.index]) {
-							pin.index = pinArray.length;
-							pinArray[pin.index] = pin;
-							pinsChanged = true;
-						} else {
-							pinArray[pin.index] = pin;
-						}
-						//if (pin.toolbarSection == this.props.name) myPins[pin.index] = pin;
-					}
-				} else {
-					delete pins[i];
-					pinsChanged = true;
+		if (!data.value) { return; }
+		//Pins are saved to storage and rendered as an array. When we persist to the distributed store, we convert the pins to an object.
+		function pinsToArray(obj) {
+			let arr = [];
+			for (let i in obj) {
+				let pin = obj[i];
+				if (!pin) continue;
+				if (typeof (pin.index) === 'undefined') {
+					pin.index = arr.length;
 				}
+				arr[pin.index] = pin;
 			}
+			return arr;
 		}
-		if (newPins.length) {
-			var nextIndex = pinArray.length;
-			for (var i = 0; i < newPins.length; i++) {
-				var pin = newPins[i];
-				if (pin) {
-					pin.index = nextIndex + 1;
-					pinArray.push(pin);
-					//if (pin.toolbarSection == this.props.name) myPins[pin.index] = pin;
-					pinsChanged = true;
-				}
+		function pinsToObj(arr) {
+			let obj = {};
+			for (let i = 0; i < arr.length; i++) {
+				let key = arr[i].component;
+				obj[key] = arr[i];
+				obj[key].index = i;
 			}
+			return obj;
+		}
+		let storedPins = this.state.pins,
+			incomingPins = data.value,
+			pinsChanged = false;
+
+		if (!Array.isArray(data.value)) {
+			incomingPins = pinsToArray(data.value);
+		}
+
+		let orderChanged = incomingPins.some((pin, index) => {
+			let storedPin = storedPins[index], incomingPin = incomingPins[index];
+			if (storedPin && incomingPin) {
+				return storedPins[index].label !== incomingPins[index].label;
+			}
+			return true;
+		});
+
+		//Either a pin was added or removed.
+		if (incomingPins.length !== storedPins.length) {
+			pinsChanged = true;
+		} else if (orderChanged) {
+			pinsChanged = true;
 		}
 
 		// If pins have changed, rerender
 		if (pinsChanged || this.initialLoad) {
-			for (var i = 0; i < pinArray.length; i++) {
-				if (pinArray[i] && pinArray[i].toolbarSection == this.props.name) myPins.push(pinArray[i]);
-			}
-
-			this.setState({ pins: myPins, minOverflowIndex: 1000000 });
-			FSBL.Clients.StorageClient.save({ topic: 'finsemble', key: 'toolbarPins', value: pins });
-			this.state.pinStore.setValue({ field: 'pins', value: pins });
+			let pinObj = pinsToObj(incomingPins);
+			this.setState({ pins: incomingPins, minOverflowIndex: 1000000 });
+			FSBL.Clients.StorageClient.save({ topic: 'finsemble', key: 'toolbarPins', value: incomingPins });
+			this.state.pinStore.setValue({ field: 'pins', value: pinObj });
 			this.initialLoad = false;
 		}
 
@@ -248,20 +252,12 @@ export default class FinsembleToolbarSection extends React.Component {
 				break;
 			}
 			if (this.props.arrangeable) {
-				components.push(<Draggable key={i} draggableId={i} index={pin.index}>
-					{(provided, snapshot) => (
-						<div>
-							<div
-								ref={provided.innerRef}
-								{...provided.draggableProps}
-								{...provided.dragHandleProps}
-							>
-								{cmp}
-							</div>
-							{provided.placeholder}
-						</div>
-					)}
-				</Draggable>);
+				components.push(
+					<FinsembleDraggable
+						wrapperClass="fullHeightFlex"
+						draggableId={pin.uuid} index={i}>
+						{cmp}
+					</FinsembleDraggable>);
 			} else {
 				components.push(cmp);
 			}
@@ -297,16 +293,9 @@ export default class FinsembleToolbarSection extends React.Component {
 			})}
 		</div>);
 		if (this.props.arrangeable) {
-			return (<Droppable className={classes} direction="horizontal" droppableId="droppable">
-				{(provided, snapshot) => (
-					<div
-						ref={provided.innerRef}
-					>
-						{section}
-						{provided.placeholder}
-					</div>
-				)}
-			</Droppable>);
+			return (<FinsembleDroppable classes={classes} direction="horizontal" droppableId="droppable">
+				{section}
+			</FinsembleDroppable>);
 		} else {
 			return section;
 		}

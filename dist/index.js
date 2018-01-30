@@ -19497,11 +19497,13 @@ exports.default = function (_ref) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__ = __webpack_require__(100);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__FinsembleButton_FinsembleButton__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__FinsembleDraggable_FinsembleDraggable__ = __webpack_require__(292);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__FinsembleDroppable_FinsembleDroppable__ = __webpack_require__(293);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react_beautiful_dnd__ = __webpack_require__(100);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react_beautiful_dnd___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react_beautiful_dnd__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__FinsembleButton_FinsembleButton__ = __webpack_require__(25);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 /*!
@@ -19525,14 +19527,18 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 
 
+
+
+
 const SECTION_BASE_CLASS = 'finsemble-toolbar-section';
 
 // Put the thing into the DOM!
-class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.Component {
+class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_3_react___default.a.Component {
 	constructor(props) {
 		super(props);
 		this.props = props;
 		this.state = {
+			pins: [],
 			clickChannel: this.props.clickChannel || FSBL.Clients.WindowClient.windowName + '-overflow-clickChannel'
 		};
 		var self = this;
@@ -19542,60 +19548,61 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_1_react___defaul
 
 	// Process pin changes on the toolbar store
 	processPins(err, data) {
-		var pins = data.value;
-		if (!pins) {
+		if (!data.value) {
 			return;
 		}
-		var pinArray = [];
-		var newPins = [];
-		var myPins = [];
-		var pinsChanged = false;
-		if (pins) {
-			for (var i in pins) {
-				var pin = pins[i];
-				if (pin) {
-					// If the pin has no index, it is new
-					if (!pin.index) {
-						newPins.push(pin);
-					} else {
-						// If we already have a pin at that index, give it a new index
-						if (pinArray[pin.index]) {
-							pin.index = pinArray.length;
-							pinArray[pin.index] = pin;
-							pinsChanged = true;
-						} else {
-							pinArray[pin.index] = pin;
-						}
-						//if (pin.toolbarSection == this.props.name) myPins[pin.index] = pin;
-					}
-				} else {
-					delete pins[i];
-					pinsChanged = true;
+		//Pins are saved to storage and rendered as an array. When we persist to the distributed store, we convert the pins to an object.
+		function pinsToArray(obj) {
+			let arr = [];
+			for (let i in obj) {
+				let pin = obj[i];
+				if (!pin) continue;
+				if (typeof pin.index === 'undefined') {
+					pin.index = arr.length;
 				}
+				arr[pin.index] = pin;
 			}
+			return arr;
 		}
-		if (newPins.length) {
-			var nextIndex = pinArray.length;
-			for (var i = 0; i < newPins.length; i++) {
-				var pin = newPins[i];
-				if (pin) {
-					pin.index = nextIndex + 1;
-					pinArray.push(pin);
-					//if (pin.toolbarSection == this.props.name) myPins[pin.index] = pin;
-					pinsChanged = true;
-				}
+		function pinsToObj(arr) {
+			let obj = {};
+			for (let i = 0; i < arr.length; i++) {
+				let key = arr[i].component;
+				obj[key] = arr[i];
+				obj[key].index = i;
 			}
+			return obj;
+		}
+		let storedPins = this.state.pins,
+		    incomingPins = data.value,
+		    pinsChanged = false;
+
+		if (!Array.isArray(data.value)) {
+			incomingPins = pinsToArray(data.value);
+		}
+
+		let orderChanged = incomingPins.some((pin, index) => {
+			let storedPin = storedPins[index],
+			    incomingPin = incomingPins[index];
+			if (storedPin && incomingPin) {
+				return storedPins[index].label !== incomingPins[index].label;
+			}
+			return true;
+		});
+
+		//Either a pin was added or removed.
+		if (incomingPins.length !== storedPins.length) {
+			pinsChanged = true;
+		} else if (orderChanged) {
+			pinsChanged = true;
 		}
 
 		// If pins have changed, rerender
 		if (pinsChanged || this.initialLoad) {
-			for (var i = 0; i < pinArray.length; i++) {
-				if (pinArray[i] && pinArray[i].toolbarSection == this.props.name) myPins.push(pinArray[i]);
-			}
-
-			this.setState({ pins: myPins, minOverflowIndex: 1000000 });
-			FSBL.Clients.StorageClient.save({ topic: 'finsemble', key: 'toolbarPins', value: pins });
-			this.state.pinStore.setValue({ field: 'pins', value: pins });
+			let pinObj = pinsToObj(incomingPins);
+			this.setState({ pins: incomingPins, minOverflowIndex: 1000000 });
+			FSBL.Clients.StorageClient.save({ topic: 'finsemble', key: 'toolbarPins', value: incomingPins });
+			this.state.pinStore.setValue({ field: 'pins', value: pinObj });
 			this.initialLoad = false;
 		}
 	}
@@ -19624,7 +19631,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_1_react___defaul
 				this.state.overflowMenuComponent = this.props.overflowMenu;
 				this.state.overflowMenuProps = this.props.overflowMenuProps;
 			} else {
-				this.state.overflowMenuComponent = __WEBPACK_IMPORTED_MODULE_2__FinsembleButton_FinsembleButton__["a" /* default */];
+				this.state.overflowMenuComponent = __WEBPACK_IMPORTED_MODULE_4__FinsembleButton_FinsembleButton__["a" /* default */];
 				this.state.overflowMenuProps = {
 					buttonType: ['Toolbar', 'MenuLauncher'],
 					menuType: 'Overflow Menu',
@@ -19747,28 +19754,19 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_1_react___defaul
 			let cmp;
 			switch (pin.type) {
 				case 'componentLauncher':
-					cmp = __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(Component, _extends({ key: i, iconClasses: 'pinned-icon', buttonType: ['AppLauncher', 'Toolbar'] }, pin));
+					cmp = __WEBPACK_IMPORTED_MODULE_3_react___default.a.createElement(Component, _extends({ key: i, iconClasses: 'pinned-icon', buttonType: ['AppLauncher', 'Toolbar'] }, pin));
 					break;
 				default:
-					cmp = __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(Component, _extends({ key: i }, pin));
+					cmp = __WEBPACK_IMPORTED_MODULE_3_react___default.a.createElement(Component, _extends({ key: i }, pin));
 					break;
 			}
 			if (this.props.arrangeable) {
-				components.push(__WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-					__WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__["Draggable"],
-					{ key: i, draggableId: i, index: pin.index },
-					(provided, snapshot) => __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-						'div',
-						null,
-						__WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-							'div',
-							_extends({
-								ref: provided.innerRef
-							}, provided.draggableProps, provided.dragHandleProps),
-							cmp
-						),
-						provided.placeholder
-					)
+				components.push(__WEBPACK_IMPORTED_MODULE_3_react___default.a.createElement(
+					__WEBPACK_IMPORTED_MODULE_0__FinsembleDraggable_FinsembleDraggable__["a" /* default */],
+					{
+						wrapperClass: 'fullHeightFlex',
+						draggableId: pin.uuid, index: i },
+					cmp
 				));
 			} else {
 				components.push(cmp);
@@ -19784,7 +19782,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_1_react___defaul
 		this.children = this.props.handlePins ? this.renderpins() : this.props.children;
 		var OverflowComponent = this.state.overflowMenuComponent;
 		var self = this;
-		var section = __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+		var section = __WEBPACK_IMPORTED_MODULE_3_react___default.a.createElement(
 			'div',
 			{ className: classes, ref: e => {
 					this.element = e;
@@ -19794,12 +19792,12 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_1_react___defaul
 					var comps = [];
 					// render the overflow component
 					if (index == self.state.minOverflowIndex) {
-						comps.push(__WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(OverflowComponent, _extends({ beforeClick: function (e) {
+						comps.push(__WEBPACK_IMPORTED_MODULE_3_react___default.a.createElement(OverflowComponent, _extends({ beforeClick: function (e) {
 								self.saveButtonsToOverflowStore(e, self);
 							} }, self.state.overflowMenuProps, { key: 'overflow' + index })));
 					}
 					// render the rest of the components hidden
-					comps.push(__WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+					comps.push(__WEBPACK_IMPORTED_MODULE_3_react___default.a.createElement(
 						'div',
 						{ style: { display: 'none' } },
 						item
@@ -19813,17 +19811,10 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_1_react___defaul
 			})
 		);
 		if (this.props.arrangeable) {
-			return __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-				__WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__["Droppable"],
-				{ className: classes, direction: 'horizontal', droppableId: 'droppable' },
-				(provided, snapshot) => __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
-					'div',
-					{
-						ref: provided.innerRef
-					},
-					section,
-					provided.placeholder
-				)
+			return __WEBPACK_IMPORTED_MODULE_3_react___default.a.createElement(
+				__WEBPACK_IMPORTED_MODULE_1__FinsembleDroppable_FinsembleDroppable__["a" /* default */],
+				{ classes: classes, direction: 'horizontal', droppableId: 'droppable' },
+				section
 			);
 		} else {
 			return section;
@@ -19868,6 +19859,79 @@ class FinsembleToolbarSeparator extends __WEBPACK_IMPORTED_MODULE_0_react___defa
 	}
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = FinsembleToolbarSeparator;
+
+
+/***/ }),
+/* 292 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__ = __webpack_require__(100);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+
+
+class FinsembleDraggable extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.Component {
+	constructor(props) {
+		super(props);
+	}
+	render() {
+		return __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+			__WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__["Draggable"],
+			{ key: this.props.index, draggableId: this.props.draggableId, index: this.props.index },
+			(provided, snapshot) => __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+				'div',
+				{ className: this.props.wrapperClass },
+				__WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+					'div',
+					_extends({ ref: provided.innerRef
+					}, provided.draggableProps, provided.dragHandleProps),
+					this.props.children
+				),
+				provided.placeholder
+			)
+		);
+	}
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = FinsembleDraggable;
+
+
+/***/ }),
+/* 293 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__ = __webpack_require__(100);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
+
+
+
+
+class FinsembleDroppable extends __WEBPACK_IMPORTED_MODULE_1_react___default.a.Component {
+	constructor(props) {
+		super(props);
+	}
+	render() {
+		return __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+			__WEBPACK_IMPORTED_MODULE_0_react_beautiful_dnd__["Droppable"],
+			{ ignoreContainerClipping: true, direction: 'horizontal', droppableId: 'droppable' },
+			(provided, snapshot) => __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(
+				'div',
+				{ className: this.props.classes,
+					ref: provided.innerRef
+				},
+				this.props.children,
+				provided.placeholder
+			)
+		);
+	}
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = FinsembleDroppable;
 
 
 /***/ })
