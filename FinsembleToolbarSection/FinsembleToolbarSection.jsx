@@ -34,7 +34,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		};
 		var self = this;
 
-
+		this.reorderPins = this.reorderPins.bind(this);
 		this.processPins = this.processPins.bind(this);
 	}
 
@@ -87,7 +87,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		} else if (orderChanged) {
 			pinsChanged = true;
 		}
-
+		debugger;//eslint-disable-line
 		// If pins have changed, rerender
 		if (pinsChanged || this.initialLoad) {
 			let pinObj = pinsToObj(incomingPins);
@@ -113,7 +113,11 @@ export default class FinsembleToolbarSection extends React.Component {
 			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, menu.customData);
 		});
 	}
+	reorderPins(changeEvent) {
+		let numPins = this.state.pins.length;
 
+		let numOverflows = this.state.overflowMenuProps;
+	}
 	componentDidMount() {
 		window.addEventListener('resize', this.handleResize);
 		var self = this;
@@ -143,13 +147,17 @@ export default class FinsembleToolbarSection extends React.Component {
 
 			// listener for overflow clicks
 			FSBL.Clients.RouterClient.addListener(this.state.clickChannel, function (err, response) {
-				self.triggerClick(response.data.index);
+				if (response.data.changeEvent) {
+					self.reorderPins(response.data.changeEvent);
+				} else {
+					self.triggerClick(response.data.index);
+				}
 			});
 
 		}
 
 		if (this.props.handlePins) {
-			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: 'Finsemble-Toolbar-Store' }, function (err, store) {
+			FSBL.Clients.DistributedStoreClient.getStore({ global: true, store: 'Finsemble-Toolbar-Store' }, function (err, store) {
 				// Load pins from storage
 				self.setState({ pinStore: store });
 				FSBL.Clients.StorageClient.get({ topic: 'finsemble', key: 'toolbarPins' }, function (err, pins) {
@@ -178,7 +186,25 @@ export default class FinsembleToolbarSection extends React.Component {
      * @memberof FinsembleToolbarSection
      */
 	triggerClick(index) {
-		this.element.children[index + 1].children[0].click();
+		function getToolbarButton(el) {
+			if (el.children) {
+				for (let i = 0; i < el.children.length; i++){
+					let child = el.children[i];
+					if (child.children[0].className.includes('finsemble-toolbar-button')) {
+						return child.children[0];
+					} else {
+						return getToolbarButton(child);
+					}
+				}
+			}
+			return null;
+		}
+		let toolbarButton = getToolbarButton(this.element.children[index+1]);
+		if (toolbarButton) {
+			toolbarButton.click();
+		} else {
+			console.warn(`Could not find button to click for index: ${index}`);
+		}
 	}
 
 	/**
@@ -201,7 +227,7 @@ export default class FinsembleToolbarSection extends React.Component {
 	componentDidUpdate() {
 		if (!this.props.handleOverflow) return;
 		var self = this;
-		function getComponentProps(cmp){
+		function getComponentProps(cmp) {
 			//if the component has children, we want the properties of the child..if not, we want the component's properties. the overflow menu needs those.
 			//@todo, do this better. give the cmp a unique id that we can grab from props or props.children...just traverse the tree until we find it.
 			if (cmp.props.children) {
@@ -209,6 +235,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			}
 			return cmp.props;
 		}
+		debugger;//eslint-disable-line
 		if (self.hasOverflow()) {
 			var e = self.element;
 			var right = e.offsetLeft + e.offsetWidth - 40;
@@ -223,7 +250,6 @@ export default class FinsembleToolbarSection extends React.Component {
 					overflow.push({ item: getComponentProps(self.children[i]), index: i });
 				}
 			}
-			debugger //eslint-disable-line
 			self.setState({
 				overflow: overflow,
 				minOverflowIndex: (overflow[0] ? overflow[0].index : minOverflowIndex)
@@ -240,7 +266,6 @@ export default class FinsembleToolbarSection extends React.Component {
      * @memberof FinsembleToolbarSection
      */
 	saveButtonsToOverflowStore(e, self) {
-		debugger;//eslint-disable-line
 		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.state.clickChannel });
 		function makeButtonsSafeForRouter(overflow) {
 			return overflow.map((el) => {
@@ -249,9 +274,11 @@ export default class FinsembleToolbarSection extends React.Component {
 			});
 		}
 		let buttons = makeButtonsSafeForRouter(self.state.overflow);
-		self.state.overflowStore.setValue({
-			field: 'buttons',
-			value: buttons
+		self.state.overflowStore.setValue({ field: 'pins', value: self.state.pins }, () => {
+			self.state.overflowStore.setValue({
+				field: 'buttons',
+				value: buttons
+			});
 		});
 	}
 

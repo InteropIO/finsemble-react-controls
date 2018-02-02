@@ -19529,10 +19529,11 @@ class FinsembleOverflowMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.
 		this.onStateChange = props.onStateChange || function noop() {};
 		this.buttonChangeListener = this.buttonChangeListener.bind(this);
 		this.clickChannelListner = this.clickChannelListner.bind(this);
+		this.onDragEnd = this.onDragEnd.bind(this);
+		this.onClick = this.onClick.bind(this);
 	}
 
 	buttonChangeListener(err, response) {
-		debugger; //eslint-disable-line
 		if (response.value) {
 			this.setState({ buttons: response.value }, self.onStateChange);
 		}
@@ -19547,7 +19548,6 @@ class FinsembleOverflowMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.
 	componentWillMount() {
 		var self = this;
 		FSBL.Clients.DistributedStoreClient.createStore({ store: this.props.overflowMenuStore, global: true }, function (err, store) {
-			debugger; //eslint-disable-line
 			self.setState({ store: store });
 			store.getValue('buttons', function (err, response) {});
 
@@ -19566,10 +19566,13 @@ class FinsembleOverflowMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.
 		this.state.store.removeListener({ field: 'clickChannel' }, this.clickChannelListner);
 	}
 
+	onDragEnd(changeEvent) {
+		FSBL.Clients.RouterClient.transmit(this.state.clickChannel, { changeEvent: changeEvent });
+	}
 	// This onClick applies to the FinsembleMenuItemLabel inside the FinsembleMenuItem.
-	onClick(e) {
+	onClick(e, buttonIndex) {
 		//The props of the MenuItem itself are passed to the Label as menuItemProps.
-		FSBL.Clients.RouterClient.transmit(this.props.menuItemProps.clickChannel, { index: this.props.menuItemProps.clickIndex });
+		FSBL.Clients.RouterClient.transmit(this.state.clickChannel, { index: buttonIndex });
 	}
 
 	render() {
@@ -19578,12 +19581,12 @@ class FinsembleOverflowMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.
 
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			__WEBPACK_IMPORTED_MODULE_1__FinsembleMenu_FinsembleMenu__["a" /* default */],
-			null,
+			this.props,
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				__WEBPACK_IMPORTED_MODULE_3__FinsembleMenuSection_FinsembleMenuSection__["a" /* default */],
-				{ className: 'menu-primary' },
+				_extends({ onDragEnd: this.onDragEnd }, this.props, { className: 'menu-primary' }),
 				this.state.buttons.map(button => {
-					return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__FinsembleMenuItem_FinsembleMenuItem__["a" /* default */], _extends({ clickChannel: self.state.clickChannel }, button.item, { key: button.index, clickIndex: button.index, onClick: self.onClick }));
+					return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__FinsembleMenuItem_FinsembleMenuItem__["a" /* default */], _extends({ clickChannel: self.state.clickChannel }, button.item, { key: button.index, clickIndex: button.index, onClick: e => self.onClick(e, button.index) }));
 				})
 			)
 		);
@@ -19692,6 +19695,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 		};
 		var self = this;
 
+		this.reorderPins = this.reorderPins.bind(this);
 		this.processPins = this.processPins.bind(this);
 	}
 
@@ -19747,7 +19751,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 		} else if (orderChanged) {
 			pinsChanged = true;
 		}
-
+		debugger; //eslint-disable-line
 		// If pins have changed, rerender
 		if (pinsChanged || this.initialLoad) {
 			let pinObj = pinsToObj(incomingPins);
@@ -19772,7 +19776,11 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, menu.customData);
 		});
 	}
+	reorderPins(changeEvent) {
+		let numPins = this.state.pins.length;
 
+		let numOverflows = this.state.overflowMenuProps;
+	}
 	componentDidMount() {
 		window.addEventListener('resize', this.handleResize);
 		var self = this;
@@ -19802,12 +19810,16 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 
 			// listener for overflow clicks
 			FSBL.Clients.RouterClient.addListener(this.state.clickChannel, function (err, response) {
-				self.triggerClick(response.data.index);
+				if (response.data.changeEvent) {
+					self.reorderPins(response.data.changeEvent);
+				} else {
+					self.triggerClick(response.data.index);
+				}
 			});
 		}
 
 		if (this.props.handlePins) {
-			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: 'Finsemble-Toolbar-Store' }, function (err, store) {
+			FSBL.Clients.DistributedStoreClient.getStore({ global: true, store: 'Finsemble-Toolbar-Store' }, function (err, store) {
 				// Load pins from storage
 				self.setState({ pinStore: store });
 				FSBL.Clients.StorageClient.get({ topic: 'finsemble', key: 'toolbarPins' }, function (err, pins) {
@@ -19835,7 +19847,25 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
      * @memberof FinsembleToolbarSection
      */
 	triggerClick(index) {
-		this.element.children[index + 1].children[0].click();
+		function getToolbarButton(el) {
+			if (el.children) {
+				for (let i = 0; i < el.children.length; i++) {
+					let child = el.children[i];
+					if (child.children[0].className.includes('finsemble-toolbar-button')) {
+						return child.children[0];
+					} else {
+						return getToolbarButton(child);
+					}
+				}
+			}
+			return null;
+		}
+		let toolbarButton = getToolbarButton(this.element.children[index + 1]);
+		if (toolbarButton) {
+			toolbarButton.click();
+		} else {
+			console.warn(`Could not find button to click for index: ${index}`);
+		}
 	}
 
 	/**
@@ -19866,6 +19896,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 			}
 			return cmp.props;
 		}
+		debugger; //eslint-disable-line
 		if (self.hasOverflow()) {
 			var e = self.element;
 			var right = e.offsetLeft + e.offsetWidth - 40;
@@ -19880,7 +19911,6 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 					overflow.push({ item: getComponentProps(self.children[i]), index: i });
 				}
 			}
-			debugger; //eslint-disable-line
 			self.setState({
 				overflow: overflow,
 				minOverflowIndex: overflow[0] ? overflow[0].index : minOverflowIndex
@@ -19897,7 +19927,6 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
      * @memberof FinsembleToolbarSection
      */
 	saveButtonsToOverflowStore(e, self) {
-		debugger; //eslint-disable-line
 		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.state.clickChannel });
 		function makeButtonsSafeForRouter(overflow) {
 			return overflow.map(el => {
@@ -19906,9 +19935,11 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 			});
 		}
 		let buttons = makeButtonsSafeForRouter(self.state.overflow);
-		self.state.overflowStore.setValue({
-			field: 'buttons',
-			value: buttons
+		self.state.overflowStore.setValue({ field: 'pins', value: self.state.pins }, () => {
+			self.state.overflowStore.setValue({
+				field: 'buttons',
+				value: buttons
+			});
 		});
 	}
 

@@ -18,11 +18,11 @@ export default class FinsembleOverflowMenu extends React.Component {
 		this.onStateChange = props.onStateChange || function noop() { };
 		this.buttonChangeListener = this.buttonChangeListener.bind(this);
 		this.clickChannelListner = this.clickChannelListner.bind(this);
-
+		this.onDragEnd = this.onDragEnd.bind(this);
+		this.onClick = this.onClick.bind(this);
 	}
 
 	buttonChangeListener(err, response) {
-		debugger;//eslint-disable-line
 		if (response.value) {
 			this.setState({ buttons: response.value }, self.onStateChange);
 		}
@@ -37,7 +37,6 @@ export default class FinsembleOverflowMenu extends React.Component {
 	componentWillMount() {
 		var self = this;
 		FSBL.Clients.DistributedStoreClient.createStore({ store: this.props.overflowMenuStore, global: true }, function (err, store) {
-			debugger;//eslint-disable-line
 			self.setState({ store: store });
 			store.getValue('buttons', function (err, response) {
 
@@ -58,20 +57,24 @@ export default class FinsembleOverflowMenu extends React.Component {
 		this.state.store.removeListener({ field: 'clickChannel' }, this.clickChannelListner);
 	}
 
+	onDragEnd(changeEvent) {
+		FSBL.Clients.RouterClient.transmit(this.state.clickChannel, { changeEvent: changeEvent });
+
+	}
 	// This onClick applies to the FinsembleMenuItemLabel inside the FinsembleMenuItem.
-	onClick(e) {
+	onClick(e, buttonIndex) {
 		//The props of the MenuItem itself are passed to the Label as menuItemProps.
-		FSBL.Clients.RouterClient.transmit(this.props.menuItemProps.clickChannel, { index: this.props.menuItemProps.clickIndex });
+		FSBL.Clients.RouterClient.transmit(this.state.clickChannel, { index: buttonIndex });
 	}
 
 	render() {
 		if (!this.state.buttons || !this.state.buttons.length) return null;
 		var self = this;
 
-		return <FinsembleMenu>
-			<FinsembleMenuSection className='menu-primary'>
+		return <FinsembleMenu {...this.props}>
+			<FinsembleMenuSection onDragEnd={this.onDragEnd} {...this.props} className='menu-primary'>
 				{this.state.buttons.map((button) => {
-					return <FinsembleMenuItem clickChannel={self.state.clickChannel} {...button.item} key={button.index} clickIndex={button.index} onClick={self.onClick} />;
+					return <FinsembleMenuItem clickChannel={self.state.clickChannel} {...button.item} key={button.index} clickIndex={button.index} onClick={(e)=>self.onClick(e, button.index)} />;
 				})}
 			</FinsembleMenuSection>
 		</FinsembleMenu>;
