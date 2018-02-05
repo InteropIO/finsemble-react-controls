@@ -38,10 +38,16 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.processPins = this.processPins.bind(this);
 	}
 
-	// Process pin changes on the toolbar store
+	/**
+	 *
+	 * Processes pin changes on the global toolbar store. This happens when a pin is added or removed to any toolbar. It also happens when a pin is reordered from the toolbar or the overflow menu.
+	 *
+	 * @param {*} err
+	 * @param {*} data
+	 */
 	processPins(err, data) {
 		if (!data.value) { return; }
-		//Pins are saved to storage and rendered as an array. When we persist to the distributed store, we convert the pins to an object.
+		//Pins are saved to storage and rendered as an array. When we persist to the distributed store, we convert the pins to an object because right now we cannot save arrays properly.
 		function pinsToArray(obj) {
 			let arr = [];
 			for (let i in obj) {
@@ -68,11 +74,11 @@ export default class FinsembleToolbarSection extends React.Component {
 		let storedPins = this.state.pins,
 			incomingPins = data.value,
 			pinsChanged = false;
-
+		//If we get an object, convert it to an array.
 		if (!Array.isArray(data.value)) {
 			incomingPins = pinsToArray(data.value);
 		}
-
+		//Just lets us know if any of them have changed.
 		let orderChanged = incomingPins.some((pin, index) => {
 			let storedPin = storedPins[index], incomingPin = incomingPins[index];
 			if (storedPin && incomingPin) {
@@ -87,7 +93,6 @@ export default class FinsembleToolbarSection extends React.Component {
 		} else if (orderChanged) {
 			pinsChanged = true;
 		}
-		debugger;//eslint-disable-line
 		// If pins have changed, rerender
 		if (pinsChanged || this.initialLoad) {
 			let pinObj = pinsToObj(incomingPins);
@@ -96,7 +101,6 @@ export default class FinsembleToolbarSection extends React.Component {
 			this.state.pinStore.setValue({ field: 'pins', value: pinObj });
 			this.initialLoad = false;
 		}
-
 	}
 
 	/**
@@ -113,11 +117,167 @@ export default class FinsembleToolbarSection extends React.Component {
 			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, menu.customData);
 		});
 	}
-	reorderPins(changeEvent) {
-		let numPins = this.state.pins.length;
 
-		let numOverflows = this.state.overflowMenuProps;
+	/**
+	 * When the window resizes, we set the overflow index huge so we recalculate the overflow.
+	 * @param {*} e
+	 */
+	handleResize(e) {
+		this.setState({ minOverflowIndex: 10000000 });
 	}
+
+	/**
+     * Trigger a click on the proper item. index + 1 because overflow menu launching component is added.
+     *
+     * @param {number} index
+     * @memberof FinsembleToolbarSection
+     */
+	triggerClick(index) {
+		function getToolbarButton(el) {
+			if (el.children) {
+				for (let i = 0; i < el.children.length; i++) {
+					let child = el.children[i];
+					if (child.children[0].className.includes('finsemble-toolbar-button')) {
+						return child.children[0];
+					} else {
+						return getToolbarButton(child);
+					}
+				}
+			}
+			return null;
+		}
+		let toolbarButton = getToolbarButton(this.element.children[index + 1]);
+		if (toolbarButton) {
+			toolbarButton.click();
+		} else {
+			console.warn(`Could not find button to click for index: ${index}`);
+		}
+	}
+
+	/**
+     * Do we have an overflow? Assumes 40 as the size of the overflow component -> TODO: make this dynamic.
+     *
+     * @returns
+     * @memberof FinsembleToolbarSection
+     */
+	hasOverflow() {
+		var e = this.element;
+		return (e.offsetWidth < e.scrollWidth - 40);
+	}
+
+
+	/**
+     * This is used on clicking the overflow component. It adds the communication channel for clicks and the overflowing items to the overflowMenuStore.
+     * beforeClick (see FinsembleButton) is used because this needs to happen before the default click action.
+     *
+     * @param {any} e
+     * @param {any} self
+     * @memberof FinsembleToolbarSection
+     */
+	saveButtonsToOverflowStore(e, self) {
+		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.state.clickChannel });
+		function makeButtonsSafeForRouter(overflow) {
+			return overflow.map((el) => {
+				delete el.item.children;
+				return el;
+			});
+		}
+		let buttons = makeButtonsSafeForRouter(self.state.overflow);
+		//Before we set the buttons, set the pins in the overflow store. This way, if the user tries to
+		//reorder their list of buttons, they can calculate the offset and send back a proper changeEvent.
+		//By default, the 1st index will be 0 in the overflow menu, but that pin may be 10th in the list of pins. This block
+		//allows reordering in the overflow menu to work properly.
+		self.state.overflowStore.setValue({ field: 'pins', value: self.state.pins }, () => {
+			self.state.overflowStore.setValue({
+				field: 'buttons',
+				value: buttons
+			});
+		});
+	}
+	/**
+	 * When the overflow menu or toolbar section reorders items, we send an event off to the global toolbar store, which reorders the pins. Then it sets the value on the global store, which we receive, and rerender.
+	 * @param {*} changeEvent
+	 */
+	reorderPins(changeEvent) {
+		this.state.pinStore.Dispatcher.dispatch({ actionType: 'reorderPins', changeEvent: changeEvent });
+	}
+
+
+	/**
+     * Here if we have overflow, force a rerender by setting the state. state.overflow = overflowing items. state.minOverflowIndex = where overflow starts, i.e. hide items starting there
+     *
+     * @returns
+     * @memberof FinsembleToolbarSection
+     */
+	componentDidUpdate() {
+		if (!this.props.handleOverflow) return;
+		var self = this;
+		function getComponentProps(cmp) {
+			//if the component has children, we want the properties of the child..if not, we want the component's properties. the overflow menu needs those.
+			//@todo, do this better. give the cmp a unique id that we can grab from props or props.children...just traverse the tree until we find it.
+			if (cmp.props.children) {
+				return cmp.props.children.props;
+			}
+			return cmp.props;
+		}
+		if (self.hasOverflow()) {
+			var e = self.element;
+			var right = e.offsetLeft + e.offsetWidth - 40;
+			var overflow = [];
+			var minOverflowIndex = 10000000;
+			for (var i = 0; i < e.children.length; i++) {
+				var item = e.children[i];
+				if ((item.offsetLeft + item.offsetWidth) > right) {
+					minOverflowIndex = i;
+				}
+				if (i >= minOverflowIndex) {
+					overflow.push({ item: getComponentProps(self.children[i]), index: i });
+				}
+			}
+			self.setState({
+				overflow: overflow,
+				minOverflowIndex: (overflow[0] ? overflow[0].index : minOverflowIndex)
+			});
+		}
+	}
+	/**
+	 * A convenience function to keep the render function semi-readable.
+	 * This iterates through each pin and figures out what kind of component it is. If the section is arrangeable, it renders finsembleDraggables.
+	 */
+	renderpins() {
+		if (!this.state.pins) { return []; }
+		var components = [];
+		for (let i = 0; i < this.state.pins.length; i++) {
+			let pin = this.state.pins[i];
+			if (!pin) continue;
+			let Component = this.props.pinnableItems[pin.type];
+			let cmp;
+
+			switch (pin.type) {
+			case 'componentLauncher':
+				cmp = <Component key={i} iconClasses="pinned-icon" buttonType={['AppLauncher', 'Toolbar']} {...pin} />;
+				break;
+			default:
+				cmp = <Component key={i} {...pin} />;
+				break;
+			}
+
+			if (this.props.arrangeable) {
+				components.push(
+					//Wrap the component with a FinsembleDraggable.
+					<FinsembleDraggable
+						wrapperClass="fullHeightFlex"
+						draggableId={pin.uuid} index={i}>
+						{cmp}
+					</FinsembleDraggable>);
+			} else {
+				components.push(cmp);
+			}
+		}
+		return components;
+	}
+
+
 	componentDidMount() {
 		window.addEventListener('resize', this.handleResize);
 		var self = this;
@@ -141,19 +301,19 @@ export default class FinsembleToolbarSection extends React.Component {
 
 			// create/get a store for checking if overflowmenu has been spawned. If not, spawn
 			FSBL.Clients.DistributedStoreClient.createStore({ global: true, store: overflowMenuStoreName }, function (err, store) {
-
 				self.setState({ overflowStore: store });
 			});
 
 			// listener for overflow clicks
 			FSBL.Clients.RouterClient.addListener(this.state.clickChannel, function (err, response) {
+				//Triggered if the user reordered the overflow items.
 				if (response.data.changeEvent) {
 					self.reorderPins(response.data.changeEvent);
 				} else {
+					//Triggered if the user tries to launch an item.
 					self.triggerClick(response.data.index);
 				}
 			});
-
 		}
 
 		if (this.props.handlePins) {
@@ -175,143 +335,11 @@ export default class FinsembleToolbarSection extends React.Component {
 		self.state.pinStore.removeListener({ field: 'pins' }, self.processPins);
 	}
 
-	handleResize(e) {
-		this.setState({ minOverflowIndex: 10000000 }); // this will force all components to re-render which will cause a recalculation of overflow
-	}
-
 	/**
-     * Trigger a click on the proper item. index + 1 because overflow menu launching component is added.
-     *
-     * @param {number} index
-     * @memberof FinsembleToolbarSection
-     */
-	triggerClick(index) {
-		function getToolbarButton(el) {
-			if (el.children) {
-				for (let i = 0; i < el.children.length; i++){
-					let child = el.children[i];
-					if (child.children[0].className.includes('finsemble-toolbar-button')) {
-						return child.children[0];
-					} else {
-						return getToolbarButton(child);
-					}
-				}
-			}
-			return null;
-		}
-		let toolbarButton = getToolbarButton(this.element.children[index+1]);
-		if (toolbarButton) {
-			toolbarButton.click();
-		} else {
-			console.warn(`Could not find button to click for index: ${index}`);
-		}
-	}
-
-	/**
-     * Do we have an overflow? Assumes 40 as the size of the overflow component -> TODO: make this dynamic.
-     *
-     * @returns
-     * @memberof FinsembleToolbarSection
-     */
-	hasOverflow() {
-		var e = this.element;
-		return (e.offsetWidth < e.scrollWidth - 40);
-	}
-
-	/**
-     * Here if we have overflow, force a rerender by setting the state. state.overflow = overflowing items. state.minOverflowIndex = where overflow starts, i.e. hide items starting there
-     *
-     * @returns
-     * @memberof FinsembleToolbarSection
-     */
-	componentDidUpdate() {
-		if (!this.props.handleOverflow) return;
-		var self = this;
-		function getComponentProps(cmp) {
-			//if the component has children, we want the properties of the child..if not, we want the component's properties. the overflow menu needs those.
-			//@todo, do this better. give the cmp a unique id that we can grab from props or props.children...just traverse the tree until we find it.
-			if (cmp.props.children) {
-				return cmp.props.children.props;
-			}
-			return cmp.props;
-		}
-		debugger;//eslint-disable-line
-		if (self.hasOverflow()) {
-			var e = self.element;
-			var right = e.offsetLeft + e.offsetWidth - 40;
-			var overflow = [];
-			var minOverflowIndex = 10000000;
-			for (var i = 0; i < e.children.length; i++) {
-				var item = e.children[i];
-				if ((item.offsetLeft + item.offsetWidth) > right) {
-					minOverflowIndex = i;
-				}
-				if (i >= minOverflowIndex) {
-					overflow.push({ item: getComponentProps(self.children[i]), index: i });
-				}
-			}
-			self.setState({
-				overflow: overflow,
-				minOverflowIndex: (overflow[0] ? overflow[0].index : minOverflowIndex)
-			});
-		}
-	}
-
-	/**
-     * This is used on clicking the overflow component. It adds the communication channel for clicks and the overflowing items to the overflowMenuStore.
-     * beforeClick (see FinsembleButton) is used because this needs to happen before the default click action.
-     *
-     * @param {any} e
-     * @param {any} self
-     * @memberof FinsembleToolbarSection
-     */
-	saveButtonsToOverflowStore(e, self) {
-		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.state.clickChannel });
-		function makeButtonsSafeForRouter(overflow) {
-			return overflow.map((el) => {
-				delete el.item.children;
-				return el;
-			});
-		}
-		let buttons = makeButtonsSafeForRouter(self.state.overflow);
-		self.state.overflowStore.setValue({ field: 'pins', value: self.state.pins }, () => {
-			self.state.overflowStore.setValue({
-				field: 'buttons',
-				value: buttons
-			});
-		});
-	}
-
-	renderpins() {
-		if (!this.state.pins) { return []; }
-		var components = [];
-		for (let i = 0; i < this.state.pins.length; i++) {
-			let pin = this.state.pins[i];
-			if (!pin) continue;
-			let Component = this.props.pinnableItems[pin.type];
-			let cmp;
-			switch (pin.type) {
-			case 'componentLauncher':
-				cmp = <Component key={i} iconClasses="pinned-icon" buttonType={['AppLauncher', 'Toolbar']} {...pin} />;
-				break;
-			default:
-				cmp = <Component key={i} {...pin} />;
-				break;
-			}
-			if (this.props.arrangeable) {
-				components.push(
-					<FinsembleDraggable
-						wrapperClass="fullHeightFlex"
-						draggableId={pin.uuid} index={i}>
-						{cmp}
-					</FinsembleDraggable>);
-			} else {
-				components.push(cmp);
-			}
-		}
-		return components;
-	}
-
+	 * Render method. It's very complicated.
+	 * If there's an overflow component, we calculate which items in the section should be rendered, and which should be shuttled off to the overflowMenu.
+	 * This code is very tied to the center-section in a toolbar that allows for pinned components, workspaces, and groups of components. We will eventually abstract that a bit.
+	 */
 	render() {
 		let classes = this.props.className || '';
 		classes += ` ${SECTION_BASE_CLASS}`;
@@ -331,14 +359,14 @@ export default class FinsembleToolbarSection extends React.Component {
 					comps.push(<div style={{ display: 'none' }}>{item}</div>);
 					if (self.element && !self.element.className.includes('overflow')) self.element.className += ' overflow';
 					return comps;
-
-
 				} else {
 					if (self.element && self.element.className.includes('overflow')) self.element.className = self.element.className.replace('overflow', '');
 					return item;
 				}
 			})}
 		</div>);
+		//If we can arrange the items, we need to wrap it in a droppable.
+		//@todo eventually we may allow vertical toolbars. When that happens this direction will need to be dynamic.
 		if (this.props.arrangeable) {
 			return (<FinsembleDroppable classes={classes} direction="horizontal" droppableId="droppable">
 				{section}

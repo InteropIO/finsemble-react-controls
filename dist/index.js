@@ -19529,6 +19529,7 @@ class FinsembleOverflowMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.
 		this.onStateChange = props.onStateChange || function noop() {};
 		this.buttonChangeListener = this.buttonChangeListener.bind(this);
 		this.clickChannelListner = this.clickChannelListner.bind(this);
+		this.pinListListener = this.pinListListener.bind(this);
 		this.onDragEnd = this.onDragEnd.bind(this);
 		this.onClick = this.onClick.bind(this);
 	}
@@ -19545,14 +19546,19 @@ class FinsembleOverflowMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.
 		}
 	}
 
+	pinListListener(err, response) {
+		if (response.value) {
+			this.setState({ pins: response.value }, self.onStateChange);
+		}
+	}
+
 	componentWillMount() {
 		var self = this;
 		FSBL.Clients.DistributedStoreClient.createStore({ store: this.props.overflowMenuStore, global: true }, function (err, store) {
 			self.setState({ store: store });
 			store.getValue('buttons', function (err, response) {});
-
+			store.addListener({ field: 'pins' }, self.pinListListener);
 			store.addListener({ field: 'buttons' }, self.buttonChangeListener);
-
 			store.addListener({ field: 'clickChannel' }, self.clickChannelListner);
 		});
 	}
@@ -19567,6 +19573,27 @@ class FinsembleOverflowMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.
 	}
 
 	onDragEnd(changeEvent) {
+		if (!changeEvent.destination) return;
+		//This block handles local state.
+		let buttons = this.state.buttons;
+		let newButtons = JSON.parse(JSON.stringify(buttons));
+		let target = newButtons[changeEvent.source.index];
+		let offset = this.state.pins.length - this.state.buttons.length;
+
+		newButtons.splice(changeEvent.source.index, 1);
+		newButtons.splice(changeEvent.destination.index, 0, target);
+		//give everything new index values after removing any empty ones.
+		newButtons = newButtons.filter(btn => btn).map((btn, i) => {
+			btn.index = i + offset;
+			btn.item.index = i + offset;
+			return btn;
+		});
+
+		changeEvent.source.index += offset;
+		changeEvent.destination.index += offset;
+
+		this.setState({ buttons: newButtons });
+		//This block makes sure global state is correct.
 		FSBL.Clients.RouterClient.transmit(this.state.clickChannel, { changeEvent: changeEvent });
 	}
 	// This onClick applies to the FinsembleMenuItemLabel inside the FinsembleMenuItem.
@@ -19751,7 +19778,6 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 		} else if (orderChanged) {
 			pinsChanged = true;
 		}
-		debugger; //eslint-disable-line
 		// If pins have changed, rerender
 		if (pinsChanged || this.initialLoad) {
 			let pinObj = pinsToObj(incomingPins);
@@ -19777,9 +19803,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 		});
 	}
 	reorderPins(changeEvent) {
-		let numPins = this.state.pins.length;
-
-		let numOverflows = this.state.overflowMenuProps;
+		this.state.pinStore.Dispatcher.dispatch({ actionType: 'reorderPins', changeEvent: changeEvent });
 	}
 	componentDidMount() {
 		window.addEventListener('resize', this.handleResize);
@@ -19896,7 +19920,6 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 			}
 			return cmp.props;
 		}
-		debugger; //eslint-disable-line
 		if (self.hasOverflow()) {
 			var e = self.element;
 			var right = e.offsetLeft + e.offsetWidth - 40;
