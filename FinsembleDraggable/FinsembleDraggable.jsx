@@ -7,9 +7,10 @@ export default class FinsembleDraggable extends React.Component {
 	render() {
 		let draggableId = this.props.draggableId || `Id-Unset-${Math.random() * 23214}`;
 		let isDragDisabled = typeof (this.props.isDragDisabled) === 'undefined' ? false : this.props.isDragDisabled;
+		let noop = () => { };
 		return (<Draggable isDragDisabled={isDragDisabled} key={this.props.index} draggableId={draggableId} index={this.props.index}>
 			{(provided, snapshot) => (
-				<div className={this.props.wrapperClass || ''}>
+				<div onClick={this.props.onClick || noop} className={this.props.wrapperClass || ''}>
 					<div ref={provided.innerRef}
 						{...provided.draggableProps}
 						{...provided.dragHandleProps}>
