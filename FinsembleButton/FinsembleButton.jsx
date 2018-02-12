@@ -180,7 +180,11 @@ export default class Button extends React.Component {
 	}
 
 	launchComponent(e) {
-		FSBL.Clients.LauncherClient.spawn(this.props.component, { addToWorkspace: true, monitor: 'mine' });
+		let params = { addToWorkspace: true, monitor: 'mine' }
+		if (this.props.params) {
+			params = this.props.params;
+		}
+		FSBL.Clients.LauncherClient.spawn(this.props.component, params);
 	}
 
 	/**
