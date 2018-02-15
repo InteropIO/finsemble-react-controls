@@ -1,7 +1,7 @@
 # FinsembleButton
 
 ## Overview
-The finsemble Button is the base component for pretty much anything that can be clicked on in a menu or a toolbar.
+The Finsemble button is the base component for pretty much anything that can be clicked on in a menu or a toolbar.
 
 ## Example
 ### Menu opener in the toolbar
