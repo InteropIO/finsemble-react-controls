@@ -1,7 +1,10 @@
 # FinsembleDialog
 
+## Overview
+The FinsembleDialog allows you to quickly assemble a functioning dialog, which is simply a Finsemble pop-up component that receives user input and transmits it to another window. It handles much of the communication with the `DialogManagerClient`, and allows you to focus on the contents of your dialog.
+
 ## Hierarchy
-This component is part of a collection of components. In order to make sure that your component has appropriate classes and styling, adhere to this hierarchy.
+This control is actually part of a collection of controls. In order to make sure that your control has appropriate classes and styling, adhere to this hierarchy.
 
 * **FinsembleDialog**
     * [FinsembleDialogQuestion](../FinsembleDialogQuestion/README.md)
@@ -9,9 +12,6 @@ This component is part of a collection of components. In order to make sure that
     * [FinsembleDialogButton](../FinsembleDialogButton/README.md)
 
 ![](./annotated-dialogs-transparent.png)
-
-## Overview
-The FinsembleDialog allows you to quickly assemble a functioning dialog, which is simply a Finsemble pop-up component that receives user input and transmits it to another window. It handles much of the communication with the `DialogManagerClient`, and allows you to focus on the contents of your dialog.
 
 ### Communication flow
 
