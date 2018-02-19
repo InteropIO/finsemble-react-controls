@@ -2,7 +2,7 @@
 
 ## Hierarchy
 
-This component is part of a collection of components. In order to make sure that your component has appropriate classes and styling, adhere to this hierarchy.
+This control is part of a collection of controls. In order to make sure that your Menu component has appropriate classes and styling, adhere to this hierarchy.
 
 * [FinsembleMenu](../FinsembleMenu/README.md)
     * [FinsembleMenuSection](../FinsembleMenuSection/README.md)
