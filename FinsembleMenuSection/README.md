@@ -1,7 +1,7 @@
 # FinsembleMenuSection
 
 ## Hierarchy
-This component is part of a collection of components. In order to make sure that your component has appropriate classes and styling, adhere to this hierarchy.
+This control is part of a collection of controls. In order to make sure that your Menu component has appropriate classes and styling, adhere to this hierarchy.
 
 * [FinsembleMenu](../FinsembleMenu/README.md)
     * **FinsembleMenuSection**
@@ -14,7 +14,7 @@ This component is part of a collection of components. In order to make sure that
 ![](../FinsembleMenu/annotated-menus-transparent.png)
 
 ## Overview
-The MenuSection is a react component that MenuItems should be placed in. If you'd like, it can be scrollable. If you set a maxHeight, it will not grow beyond that height. If you do not, it will fill the finWindow.
+The MenuSection is a React control that MenuItems should be placed in. If you'd like, it can be scrollable. If you set a maxHeight, it will not grow beyond that height. If you do not, it will fill the finWindow.
 
 ## Props
 | Prop               	| Type     	        | Possible Values | Default Value | Description |
