@@ -1,7 +1,7 @@
 # FinsembleFontIcon
 
 ## Overview
-The FinsembleFontIcon component just renders an `<i>` element with the class that's passed into the `icon` property. This is just a helper, you do not need to use it.
+The FinsembleFontIcon control just renders an `<i>` element with the class that's passed into the `icon` property. This is just a helper, you do not need to use it.
 
 ## Props
                                                                        	|
