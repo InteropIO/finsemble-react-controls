@@ -1,7 +1,7 @@
 # FinsembleDialogQuestion
 
 ## Hierarchy
-This component is part of a collection of components. In order to make sure that your component has appropriate classes and styling, adhere to this hierarchy.
+This control is part of a collection of controls. In order to make sure that your dialog component has appropriate classes and styling, adhere to this hierarchy.
 
 * [FinsembleDialog](../FinsembleDialog/README.md)
     * **FinsembleDialogQuestion**
