@@ -1,10 +1,10 @@
 # FinsembleMenu
 
 ## Overview
-The FinsembleMenu is a react component to help you to quickly assemble a menu. A menu is just an ephemeral finsemble component that shows up when a button is clicked, hides when the menu loses focus, and hides on `escape`. This react component provides styling, and handles those events common to all menus.
+The FinsembleMenu is a React control to help you to quickly assemble a menu. A menu is just an ephemeral Finsemble component that shows up when a button is clicked, hides when the menu loses focus, and hides on `escape`. This control provides styling, and handles those events common to all menus.
 
 ## Hierarchy
-This component is part of a collection of components. In order to make sure that your component has appropriate classes and styling, adhere to this hierarchy.
+This control is part of a collection of controls. In order to make sure that your menu component has appropriate classes and styling, adhere to this hierarchy.
 * **FinsembleMenu**
     * [FinsembleMenuSection](../FinsembleMenuSection/README.md)
         * [FinsembleMenuSectionLabel](../FinsembleMenuSectionLabel/README.md)
