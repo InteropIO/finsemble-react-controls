@@ -4,8 +4,17 @@
 */
 
 import React from 'react';
+import FinsembleDraggable from '../FinsembleDraggable/FinsembleDraggable';
+import FinsembleDroppable from '../FinsembleDroppable/FinsembleDroppable';
+import FinsembleDnDContext from '../FinsembleDnDContext/FinsembleDnDContext';
 const SECTION_BASE_CLASS = 'menu-section';
-
+function uuidv4() {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+		var r = Math.random() * 16 | 0,
+			v = c === 'x' ? r : r & 0x3 | 0x8;
+		return v.toString(16);
+	});
+}
 export default class FinsembleMenuSection extends React.Component {
 	constructor(props) {
 		super(props);
@@ -91,12 +100,27 @@ export default class FinsembleMenuSection extends React.Component {
 			//classes+=' ' + SECTION_BASE_CLASS;
 			classes += ` ${SECTION_BASE_CLASS}`;
 		}
-		return (<div ref={(el) => {
+		let section = (<div ref={(el) => {
 			this.wrapperReference = el;
 		}} className={classes}>
 			{this.props.children}
 		</div>);
-
-
+		if (this.props.isArrangeable) {
+			let children = React.Children.map(this.props.children, (child, i) => {
+				let isDragDisabled = false;
+				if (typeof (child.props.isDragDisabled) !== 'undefined') {
+					isDragDisabled = child.props.isDragDisabled;
+				}
+				return <FinsembleDraggable isDragDisabled={isDragDisabled} draggableId={uuidv4()} index={i}>
+					{child}
+				</FinsembleDraggable>;
+			});
+			return (<FinsembleDnDContext onDragStart={this.props.onDragStart} onDragEnd={this.props.onDragEnd}>
+				<FinsembleDroppable droppableId={uuidv4()} direction="vertical">
+					{children}
+				</FinsembleDroppable>
+			</FinsembleDnDContext>);
+		}
+		return (section);
 	}
 }

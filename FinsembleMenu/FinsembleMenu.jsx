@@ -152,7 +152,7 @@ export default class FinsembleMenu extends React.Component {
      * @memberof FinsembleMenu
      */
 	onCloseRequested() {
-		this.finWindow.removeEventListener('close-requested', this.onCloseRequested);
+		// this.finWindow.removeEventListener('close-requested', this.onCloseRequested);
 		this.finWindow.removeEventListener('blurred', this.onWindowBlurred);
 		this.finWindow.removeEventListener('shown', this.onWindowShown);
 		this.finWindow.removeEventListener('bounds-changed', this.onBoundsChanged);
