@@ -50,7 +50,7 @@ return (<FinsembleButton
 | tooltip      	| string         	| N/A | `null` | Tooltip to appear when your button is hovered over. This may also be set by using the 'title' html attribute.             	|
 | iconPosition 	| string         	| `'left', 'right'`| `'left'` | If an icon is present, the button allows you to position it to the left or to the right of the button's label.            	|
 | iconClasses  	| string         	| N/A | `null` | Additional classes that you'd like to add to your font-icon or image.            	|
-| buttonType         	| string/array 	| `'Toolbar', 'MenuItemLabel', 'MenuItemAction', 'Dialog', 'MenuLauncher'` | `null` | Type of button. The values to the left are pre-defined button types that we provide out of the box. These types confer specific css classes and/or predefined functionality.            	|
+| buttonType         	| string/array 	| `'Toolbar', 'MenuItemLabel', 'MenuItemAction', 'Dialog', 'MenuLauncher', 'AppLauncher'` | `null` | Type of button. The values to the left are pre-defined button types that we provide out of the box. These types confer specific css classes and/or predefined functionality.            	|
 | menuType     	| string         	| N/A | `null` | This is the value of any valid finsemble component. When `onClick` is fired for a `MenuLauncher` button, we spawn the component found in this property. See below for an example.             	|
 | fontIcon     	| string         	| N/A | `null` | Any CSS classes that you'd like to go on a font icon element.            	|
 | icon         	| URL            	| N/A | `null` | The URL of an image that you'd like to take the place of a font-icon in a label           	|
