@@ -36,6 +36,7 @@ export default class FinsembleToolbarSection extends React.Component {
 
 		this.reorderPins = this.reorderPins.bind(this);
 		this.processPins = this.processPins.bind(this);
+		this.handleResize = this.handleResize.bind(this);
 	}
 
 	/**
