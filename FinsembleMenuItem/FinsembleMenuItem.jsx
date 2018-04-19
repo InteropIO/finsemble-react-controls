@@ -59,7 +59,9 @@ export default class FinsembleMenuItem extends React.Component {
 		if (this.props.isPinnable) {
 			this.validateProps(['pinAction', 'isPinned']);
 			//Add extra classes if the item is pinned.
-			let pinIcon = this.props.isPinned ? 'ff-pin finsemble-item-pinned' : 'ff-pin';
+			let pinIconClass = this.props.pinIcon || 'ff-pin';
+			let activePinClass = this.props.activePinModifier || 'finsemble-item-pinned';
+			let pinIcon = this.props.isPinned ? `${pinIconClass} ${activePinClass}` : pinIconClass;
 			actionItems.push(<FinsembleMenuItemAction key="pin" onClick={this.props.pinAction}><FontIcon icon={pinIcon} /></FinsembleMenuItemAction>);
 		}
 
