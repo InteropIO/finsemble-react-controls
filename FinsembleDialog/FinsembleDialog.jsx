@@ -62,7 +62,6 @@ export default class FinsembleDialog extends React.Component {
 	handleKeyDown(e) {
 		if (FSBL.Clients.DialogManager.openerMessage === null && e.code === 'Escape') {
 			this.hideDialog();
-			FSBL.Clients.DialogManager.hideModal();
 		}
 	}
 
@@ -81,12 +80,14 @@ export default class FinsembleDialog extends React.Component {
 		FSBL.Clients.DialogManager.behaviorOnResponse = this.state.behaviorOnResponse;
 		if (this.props.isModal) {
 			this.finWindow.addEventListener('shown', FSBL.Clients.DialogManager.showModal);
+			this.finWindow.addEventListener('hidden', FSBL.Clients.DialogManager.hideModal);
 		}
 	}
 
 	componentWillUnmount() {
 		if (this.props.isModal) {
 			this.finWindow.removeEventListener('shown', FSBL.Clients.DialogManager.showModal);
+			this.finWindow.removeEventListener('hidden', FSBL.Clients.DialogManager.hideModal);
 		}
 	}
 
