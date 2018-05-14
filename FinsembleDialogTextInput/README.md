@@ -17,6 +17,9 @@ The DialogTextInput is simply a text field with the appropriate CSS to look nice
 |--------------	        |----------------	|-------------	  | ------------- | -------------	|
 | inputLabel         	| string   	| N/A                                      	| `null`        	| Label for the text field. Typically not used; the [FinsembleDialogQuestion](../FinsembleDialogQuestion/README.md) will typically serve as the label. |
 | onInputChange      	| function 	| `function`                               	| `null`        	| Function to fire when the element's value changes ||
+| maxLength      	| int 	| N/A                               	| `null`        	| Max number of characters allowed in the input box. |
+| children | ? |
+| className   	| string   	| N/A                                      	| `null`         	| The class for the dialog. |
 
 ## Example
 ```jsx

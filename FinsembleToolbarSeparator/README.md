@@ -7,3 +7,10 @@ This is a simple div that will render a vertically aligned, vertical section sep
 ```jsx
 <FinsembleToolbarSeparator />}
 ```
+
+## Props
+
+| Prop					| Type				| Possible Values 	| Default Value | Description |
+|--------------			|-------			| -------------		| ------------- | ----------- |
+| className				| string   			| N/A	| 				| Class name for the toolber separator component.|
+| children        | ? |

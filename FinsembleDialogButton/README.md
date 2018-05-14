@@ -26,3 +26,4 @@ This is just a wrapper for [FinsembleButton](../FinsembleButton/README.md) to gi
 | Prop               	| Type     	        | Possible Values | Default Value | Description |
 |--------------	        |----------------	|-------------	  | ------------- | -------------	|
 | buttonSize         	| string   	| `'sm', 'md', 'lg'`                                      	| `'md'`        	| Size of the dialog button. |
+| children | ? |
