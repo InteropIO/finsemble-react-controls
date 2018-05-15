@@ -82,6 +82,6 @@ FSBL.Clients.DialogManager.open('yesNo', dialogParams, onUserInput);
 | Prop               	| Type     	        | Possible Values | Default Value | Description |
 |--------------	        |----------------	|-------------	  | ------------- | -------------	|
 | isModal            	| boolean  	| `true, false`                            	| `false`       	| Whether to place a semi-transparent, black modal behind the dialog when it renders. This modal will cover all monitors. It can be hidden via user action on the dialog _or_ by the user clicking it and pressing `Escape`. |
-| behaviorOnResponse 	| string   	| `'hide', 'close'`                        	| `'hide'`      	| Whether to hide or close the dialog after the user responds. The default behavior is to hide the dialog and move it around, reusing it. Generally, repurposing compoents like this is more performant than spawning them when they're needed. |
 | onShowRequested    	| function 	| `function`                               	| `null`        	| This function is invoked whenever a dialog opener requests the dialog to show itself. Use this if you need to perform any async operations (e.g., re-rendering your dialog) prior to showing the dialog. **In your implementation of `onShowRequested`, you must invoke `FSBL.Clients.DialogManagerClient.showDialog`, or your dialog will remain hidden.** |
-| userInputTimeout   	| number   	| N/A                                      	| 10000         	| This is the amount of time that the opener will wait before printing a `console.warn` stating that the dialog has yet to respond. |
+| className   	| string   	| N/A                                      	| `null`         	| The class for the dialog. |
+| children   	| ? |

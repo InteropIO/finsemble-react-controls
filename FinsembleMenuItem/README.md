@@ -21,10 +21,14 @@ This control is part of a collection of controls. In order to make sure that you
 | onClick            	| function 	| N/A                                      	| `null`        	| Main action for the menu item. If there are no menu actions present, the item will occupy the full width of its parent container; if any of that div is clicked, this function is invoked. |
 | onLabelClick       	| function 	| N/A                                      	| `null`        	| Alias for onClick.        |
 | isPinnable         	| boolean  	| `true, false`                            	| `false`       	| Whether the item can be pinned to the toolbar.|
+| pinIcon              	| string   	| N/A                                      	| `'ff-pin'`        	| Class name to set what the pinIcon looks like. |
 | isPinned           	| boolean  	| `true, false`                            	| `false`       	| Whether the item is currently pinned to the toolbar. |
 | pinAction          	| funciton 	| N/A                                      	| `null`        	| What to do when the user tries to pin the item |
 | isDeletable        	| boolean  	| `true, false`                            	| `false`       	| Whether it's possible to remove the item from the menu.|
 | deleteAction       	| function 	| N/A                                      	| `null`        	| How to remove the item from the menu. |
+| className       | string    | N/A                                               | `null`  | Class name for the menuItem component. |
+| activePinModifier     | ? |
+| children     | ? |
 
 ## Examples
 ### Simple example

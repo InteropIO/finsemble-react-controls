@@ -15,3 +15,8 @@ This control is part of a collection of controls. In order to make sure that you
 
 ## Overview
 Label for a MenuItem. This is the largest part of the menuItem. It's just a button with special classes.
+
+## Props
+| Prop               	| Type     	        | Possible Values | Default Value | Description |
+|--------------	        |----------------	|-------------	  | ------------- | -------------	|
+| children | ? |

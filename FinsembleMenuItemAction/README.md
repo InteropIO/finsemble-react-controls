@@ -16,3 +16,9 @@ This control is part of a collection of controls. In order to make sure that you
 ## Overview
 The MenuItemAction is just a button inside of the MenuItemActions wrapper. It provides classes so that it looks nice; otherwise it's just a generic button.
 
+
+## Props
+| Prop               	| Type     	        | Possible Values | Default Value | Description |
+|--------------	        |----------------	|-------------	  | ------------- | -------------	|
+| className       | string    | N/A                                               | `null`  | Class name for the menuItemAction component. |
+| children | ? |

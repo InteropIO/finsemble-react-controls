@@ -16,3 +16,8 @@ This control is part of a collection of controls. In order to make sure that you
 
 ## Overview
 This component is just a wrapper that holds [FinsembleMenuItemAction](../FinsembleMenuItemAction/README.md)s.
+
+## Props
+| Prop               	| Type     	        | Possible Values | Default Value | Description |
+|--------------	        |----------------	|-------------	  | ------------- | -------------	|
+| children | ? |

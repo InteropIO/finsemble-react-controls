@@ -7,6 +7,7 @@ The FinsembleOverflowMenu control is designed to automatically handle overflow f
 | Prop         	|  Type         | Possible values | Default value | Description 	|
 |--------------	|--------------	|-------------	  | ------------- | -------------	|
 | overflowMenuStore        	| string        |  |  | The name of the Global DataStore created using the DistributedStoreClient used to send this a list of overflow items.         	|
+| onStateChange  | method      | N/A               | empty function  | Method that will get called whenever the state is set. |
 
 ## overflowMenuStore
 The store passed to overflowMenu must contain

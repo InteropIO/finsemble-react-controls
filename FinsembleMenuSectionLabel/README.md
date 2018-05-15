@@ -13,3 +13,8 @@ This control is part of a collection of controls. In order to make sure that you
                 * [FinsembleMenuItemAction](../FinsembleMenuItemAction/README.md)
 
 ![](../FinsembleMenu/annotated-menus-transparent.png)
+
+## Props
+| Prop               	| Type     	        | Possible Values | Default Value | Description |
+|--------------	        |----------------	|-------------	  | ------------- | -------------	|
+| children | ? |

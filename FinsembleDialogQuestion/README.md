@@ -15,6 +15,8 @@ This is just a wrapper that adds some classes so that the dialog question looks 
 | Prop               	| Type     	        | Possible Values | Default Value | Description |
 |--------------	        |----------------	|-------------	  | ------------- | -------------	|
 | question         	| string   	| N/A                                      	| `null`        	| Label for the primary question on your dialog. |
+| children | ? |
+| className   	| string   	| N/A                                      	| `null`         	| The class for the dialog. |
 
 ## Example
 ### Using Composition

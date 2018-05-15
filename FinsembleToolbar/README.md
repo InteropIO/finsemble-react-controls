@@ -28,3 +28,10 @@ See our sample [Toolbar component](https://github.com/ChartIQ/finsemble-seed/tre
 	...
 </FinsembleToolbar>
 ```
+
+## Props
+| Prop               	| Type     	        | Possible Values | Default Value | Description |
+|--------------	        |----------------	|-------------	  | ------------- | -------------	|
+| children | ? |
+| onDragEnd   	| method  	| N/A                                      	| `null`         	| Method that will be called on the onDragEnd event. |
+| className    | string     |N/A                                        | `null`            | Class name for the toolbar component.               |

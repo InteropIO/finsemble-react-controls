@@ -58,3 +58,13 @@ return (<FinsembleButton
 | beforeClick	| method		| `function`	|	| Method that receives the click event and is executed before the default onClick action specified by onClick. This allows the specification of multiple actions to occur on click for components build using composition from this one. |
 | afterClick	| method		| `function`	|	| Method that receives the click event and is executed after the default onClick action specified by onClick. |
 | show         	| boolean        	|`true, false`| `true` |Whether to show the button. Hide overrides show.            	|
+| customData         	| ? |
+| menuWindowName         	| string        	|N/A| `null` | Name of the window containing the menu.            	|
+| params         	| ? |
+| component         	| ? |
+| preSpawn         	| ? |
+| className         	| ? |
+| draggable         	| boolean | `true, false` | `false` | Whether to make the button draggable or not. |
+| onMouseUp         	| method | N/A | `null` | Function to be called on the onMouseUp action. |
+| onMouseDown         	| method | N/A | `null` | Function to be called on the onMouseDown action. |
+| children         	| ? |

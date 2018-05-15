@@ -10,5 +10,6 @@ This is the label used in the FinsembleButton control.
 |--------------	        |----------------	|-------------	  | ------------- | -------------	|
 | align              	| string   	| `'left', 'right'`                        	| `left`        	| Whether to align the label to the left or right of its container. |
 | label              	| string   	| N/A                                      	| `null`        	| Label for the toolbar button. |
+| className              	| string   	| N/A                                      	| `null`        	| Class for the label. |
 
 

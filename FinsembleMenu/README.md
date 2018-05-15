@@ -21,6 +21,8 @@ This control is part of a collection of controls. In order to make sure that you
 | padding            	| object   	|                                          	|               	| Padding object. By default, `FSBL.Clients.WindowClient.fitToDOM` will fit to the content of the menu. If you pass in the padding object, `fitToDOM` will give the component's innards some breathing room. |
 | padding.height     	| number   	| N/A                                      	| `null`        	| Extra height to add. 	|
 | padding.width      	| number   	| N/A                                      	| `null`        	| Extra width to add.  |
+| className       | string    | N/A                                               | `null`  | Class name for the menu component. |
+| children | ? |
 
 ## Example
 The code below is the render method for our our fileMenu.

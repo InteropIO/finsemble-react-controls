@@ -21,6 +21,11 @@ The MenuSection is a React control that MenuItems should be placed in. If you'd 
 |--------------	        |----------------	|-------------	  | ------------- | -------------	|
 | scrollable         	| boolean  	| `true, false`                            	| `false`       	| Whether the menu section is scrollable. Right now if you do not set a maxHeight, it will occupy the remainder of the vertical space in the component. |
 | maxHeight          	| number   	| N/A                                      	| `null`        	| Maximum height for the section. If the section is scrollable, the default is to fill the remaining height in the openfin window. |
+| className       | string    | N/A                                               | `null`  | Class name for the menuSection component. |
+| children        | ? |
+| isArrangeable | ? |
+| onDragStart      	| method 	| N/A                               	| `null`        	| Method that will be called on the onDragStart event. |
+| onDragEnd   	| method  	| N/A                                      	| `null`         	| Method that will be called on the onDragEnd event. |
 
 
 ## Example
