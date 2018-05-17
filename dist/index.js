@@ -9988,7 +9988,7 @@ class FinsembleDialogTextInput extends __WEBPACK_IMPORTED_MODULE_0_react___defau
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
 				{ className: 'form-group' },
-				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { type: 'text', maxLength: typeof this.props.maxLength !== 'undefined' ? this.props.maxLength : null, onChange: this.props.onInputChange, placeholder: this.props.placeholder ? this.props.placeholder : '' })
+				__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', { autoFocus: this.props.autoFocus, type: 'text', maxLength: typeof this.props.maxLength !== 'undefined' ? this.props.maxLength : null, onChange: this.props.onInputChange, placeholder: this.props.placeholder ? this.props.placeholder : '' })
 			),
 			this.props.children
 		);
