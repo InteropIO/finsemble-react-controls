@@ -32,7 +32,6 @@ export default class FinsembleToolbarSection extends React.Component {
 			pins: [],
 			clickChannel: this.props.clickChannel || FSBL.Clients.WindowClient.windowName + '-overflow-clickChannel'
 		};
-		var self = this;
 
 		this.reorderPins = this.reorderPins.bind(this);
 		this.processPins = this.processPins.bind(this);
@@ -41,6 +40,9 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.onDrag = this.onDrag.bind(this);
 		this.onDragEnd = this.onDragEnd.bind(this);
 		this.onDragOver = this.onDragOver.bind(this);
+		this.groupMaskShown = this.groupMaskShown.bind(this);
+		this.groupMaskHidden = this.groupMaskHidden.bind(this);
+		this.configCache = {};
 
 	}
 
@@ -138,7 +140,7 @@ export default class FinsembleToolbarSection extends React.Component {
      * @param {number} index
      * @memberof FinsembleToolbarSection
      */
-	triggerClick(index) {
+	triggerClick(index, element) {
 		function getToolbarButton(el) {
 			if (el.children) {
 				for (let i = 0; i < el.children.length; i++) {
@@ -152,7 +154,8 @@ export default class FinsembleToolbarSection extends React.Component {
 			}
 			return null;
 		}
-		let toolbarButton = getToolbarButton(this.element.children[index + 1]);
+		if (!element) element = this.element.children[index + 1];
+		let toolbarButton = getToolbarButton(element);
 		if (toolbarButton) {
 			toolbarButton.click();
 		} else {
@@ -249,8 +252,72 @@ export default class FinsembleToolbarSection extends React.Component {
 		}
 	}
 
+	startMouseTracking(component) {
+		console.log("In Mouse Tracking");
+		FSBL.System.getMousePosition((err, mp) => {
+			mp.height = this.configCache[component].height;
+			mp.width = this.configCache[component].width;
+			if (this.dragging) {
+				if (!this.dragScrimVisible && !this.groupMaskVisible) {
+					this.props.dragScrim.show();
+					this.dragScrimVisible = true;
+				}
+				this.props.dragScrim.setBounds(mp);
+				setTimeout(() => {
+					this.startMouseTracking(component);
+				}, 10);
+				if (this.groupMaskVisible) {
+					this.props.dragScrim.hide();
+					this.props.dragScrimVisible = false;
+				}
+			} else {
+				this.props.dragScrim.hide();
+				this.props.dragScrimVisible = false;
+				if (this.props.groupMask) {
+					this.props.groupMask.removeEventListener("shown", this.groupMaskShown);
+					this.props.groupMask.removeEventListener("hidden", this.groupMaskHidden);
+				}
+			}
+		});
+	}
+
+	groupMaskShown() {
+		this.groupMaskVisible = true;
+	}
+
+	groupMaskHidden() {
+		this.groupMaskVisible = false;
+	}
+
 	onDragStart(e, pin) {
+		if (pin.type == "componentLauncher") {
+			if (!this.configCache[pin.component]) {
+				this.configCache[pin.component] = {
+					height: 600, width: 800
+				};
+				FSBL.Clients.ConfigClient.getValue({ field: "finsemble.components." + pin.component + ".window" }, (err, response) => {
+					if (response) Object.assign(this.configCache[pin.component], response); //makes sure we always have a height and width
+				});
+			}
+			if (FSBL.Clients.WindowClient.startTilingOrTabbing) FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true });
+			if (this.props.dragScrim) {
+				let img = new Image();
+				img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
+				e.dataTransfer.setDragImage(img, 0, 0);
+				this.startMouseTracking(pin.component);
+				if (this.props.groupMask) {
+					this.props.groupMask.addEventListener("shown", this.groupMaskShown);
+					this.props.groupMask.addEventListener("hidden", this.groupMaskHidden);
+				}
+			} else if (this.props.dragImage) {
+				e.dataTransfer.setDragImage(this.props.dragImage, 0, 0);
+			}
+		}
+		e.dataTransfer.setData("text/json", JSON.stringify(pin));
+
 		console.log('dragstart', pin);
+		this.dragging = true;
+
 	}
 
 	onDragOver(e, pin) {
@@ -263,11 +330,43 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	onDragEnd(e, pin) { //If no drop happened, then we need to spawn component if required
+		if (this.dragging) {
+			this.dragging = false;
+			if (pin.type == "componentLauncher") {
+
+				let spawnParams = Object.assign({}, pin.params);
+				spawnParams.top = e.screenY;
+				spawnParams.left = e.screenX;
+				spawnParams.position = "virtual";
+				if (!spawnParams.options) spawnParams.options = {};
+				spawnParams.options.autoShow = false;
+				delete spawnParams.monitor;
+				FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, function (err, response) {
+					if (FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing) FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing({ windowIdentifier: response.windowIdentifier });
+				});
+				if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
+			}
+		}
 		console.log('dragend', pin);
 	}
 
 	onDrop(e, pin) {
-		console.log('drop', pin);
+		this.dragging = false;
+		let sourcePin = JSON.parse(e.dataTransfer.getData('text/json'));
+		console.log('drop', pin, sourcePin);
+		let pins = [];
+		for (var i = 0; i < this.state.pins.length; i++) {
+			pins[i] = this.state.pins[i];
+		}
+		pins[sourcePin.index] = pin;
+		pins[pin.index] = sourcePin;
+		pin.index = sourcePin.index;
+		sourcePin.index = pin.index;
+		this.processPins(null, { value: pins });
+		//this.pinStore.setValue({ field: 'pins', value: pins });
+		if (pin.type == "componentLauncher") {
+			if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
+		}
 	}
 
 	/**
@@ -313,7 +412,6 @@ export default class FinsembleToolbarSection extends React.Component {
 							this.onDragOver(e, pin);
 						}}
 						className="fullHeightFlex"
-						draggableId={pin.uuid}
 						index={i}>
 						{cmp}
 					</div>);
