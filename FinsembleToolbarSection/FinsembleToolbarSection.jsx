@@ -43,6 +43,9 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.groupMaskShown = this.groupMaskShown.bind(this);
 		this.groupMaskHidden = this.groupMaskHidden.bind(this);
 		this.configCache = {};
+		finsembleWindow.getBounds((err, bounds) => {
+			this.windowBounds = bounds;
+		})
 
 	}
 
@@ -253,7 +256,7 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	mouseInWindow(mp) {
-		if (mp.x >= finsembleWindow.left && mp.x <= finsembleWindow.right && mp.y >= finsembleWindow.top && mp.y <= finsembleWindow.bottom) {
+		if (mp.x >= this.windowBounds.left && mp.x <= this.windowBounds.right && mp.y >= this.windowBounds.top && mp.y <= this.windowBounds.bottom) {
 			console.log("mouse is in window");
 			return true;
 		}
@@ -262,6 +265,9 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	startMouseTracking(component) {
+		finsembleWindow.getBounds((err, bounds) => {
+			this.windowBounds = bounds;
+		})
 		FSBL.System.getMousePosition((err, mp) => {
 			mp.height = this.configCache[component].height;
 			mp.width = this.configCache[component].width;
