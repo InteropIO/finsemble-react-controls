@@ -252,8 +252,16 @@ export default class FinsembleToolbarSection extends React.Component {
 		}
 	}
 
+	mouseInWindow(mp) {
+		if (mp.x >= finsembleWindow.left && mp.x <= finsembleWindow.right && mp.y >= finsembleWindow.top && mp.y <= finsembleWindow.bottom) {
+			console.log("mouse is in window");
+			return true;
+		}
+		console.log("mouse is in not window");
+		return false;
+	}
+
 	startMouseTracking(component) {
-		console.log("In Mouse Tracking");
 		FSBL.System.getMousePosition((err, mp) => {
 			mp.height = this.configCache[component].height;
 			mp.width = this.configCache[component].width;
@@ -263,16 +271,17 @@ export default class FinsembleToolbarSection extends React.Component {
 					this.dragScrimVisible = true;
 				}
 				this.props.dragScrim.setBounds(mp);
+				if (this.groupMaskVisible || !this.mouseInWindow(mp)) {
+					this.props.dragScrim.hide();
+					this.dragScrimVisible = false;
+				}
 				setTimeout(() => {
 					this.startMouseTracking(component);
 				}, 10);
-				if (this.groupMaskVisible) {
-					this.props.dragScrim.hide();
-					this.props.dragScrimVisible = false;
-				}
+
 			} else {
 				this.props.dragScrim.hide();
-				this.props.dragScrimVisible = false;
+				this.dragScrimVisible = false;
 				if (this.props.groupMask) {
 					this.props.groupMask.removeEventListener("shown", this.groupMaskShown);
 					this.props.groupMask.removeEventListener("hidden", this.groupMaskHidden);
@@ -322,11 +331,10 @@ export default class FinsembleToolbarSection extends React.Component {
 
 	onDragOver(e, pin) {
 		e.preventDefault();
-		console.log('dragover', pin);
 	}
 
 	onDrag(e, pin) {
-		console.log('drag', pin, e.screenX, e.screenY );
+		//console.log('drag', pin, e.screenX, e.screenY );
 	}
 
 	onDragEnd(e, pin) { //If no drop happened, then we need to spawn component if required
