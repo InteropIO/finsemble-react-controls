@@ -266,15 +266,18 @@ export default class FinsembleToolbarSection extends React.Component {
 			mp.height = this.configCache[component].height;
 			mp.width = this.configCache[component].width;
 			if (this.dragging) {
-				if (!this.dragScrimVisible && !this.groupMaskVisible) {
+				let mouseInWindow = this.mouseInWindow(mp);
+				if (!this.dragScrimVisible && !this.groupMaskVisible && !mouseInWindow) {
 					this.props.dragScrim.show();
 					this.dragScrimVisible = true;
-				}
-				this.props.dragScrim.setBounds(mp);
-				if (this.groupMaskVisible || !this.mouseInWindow(mp)) {
+				} else if (this.dragScrimVisible && (this.groupMaskVisible || mouseInWindow)) {
 					this.props.dragScrim.hide();
 					this.dragScrimVisible = false;
 				}
+				if (this.dragScrimVisible) {
+					this.props.dragScrim.setBounds(mp);
+				}
+
 				setTimeout(() => {
 					this.startMouseTracking(component);
 				}, 10);
