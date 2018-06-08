@@ -37,6 +37,11 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.reorderPins = this.reorderPins.bind(this);
 		this.processPins = this.processPins.bind(this);
 		this.handleResize = this.handleResize.bind(this);
+		this.onDragStart = this.onDragStart.bind(this);
+		this.onDrag = this.onDrag.bind(this);
+		this.onDragEnd = this.onDragEnd.bind(this);
+		this.onDragOver = this.onDragOver.bind(this);
+
 	}
 
 	/**
@@ -196,6 +201,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			});
 		});
 	}
+
 	/**
 	 * When the overflow menu or toolbar section reorders items, we send an event off to the global toolbar store, which reorders the pins. Then it sets the value on the global store, which we receive, and rerender.
 	 * @param {*} changeEvent
@@ -242,6 +248,28 @@ export default class FinsembleToolbarSection extends React.Component {
 			});
 		}
 	}
+
+	onDragStart(e, pin) {
+		console.log('dragstart', pin);
+	}
+
+	onDragOver(e, pin) {
+		e.preventDefault();
+		console.log('dragover', pin);
+	}
+
+	onDrag(e, pin) {
+		console.log('drag', pin, e.screenX, e.screenY );
+	}
+
+	onDragEnd(e, pin) { //If no drop happened, then we need to spawn component if required
+		console.log('dragend', pin);
+	}
+
+	onDrop(e, pin) {
+		console.log('drop', pin);
+	}
+
 	/**
 	 * A convenience function to keep the render function semi-readable.
 	 * This iterates through each pin and figures out what kind of component it is. If the section is arrangeable, it renders finsembleDraggables.
@@ -267,11 +295,28 @@ export default class FinsembleToolbarSection extends React.Component {
 			if (this.props.arrangeable) {
 				components.push(
 					//Wrap the component with a FinsembleDraggable.
-					<FinsembleDraggable
-						wrapperClass="fullHeightFlex"
-						draggableId={pin.uuid} index={i}>
+					<div
+						draggable={true}
+						onDragStart={(e) => {
+							this.onDragStart(e, pin);
+						}}
+						onDrag={(e) => {
+							this.onDrag(e, pin);
+						}}
+						onDragEnd={(e) => {
+							this.onDragEnd(e, pin);
+						}}
+						onDrop={(e) => {
+							this.onDrop(e, pin);
+						}}
+						onDragOver={(e) => {
+							this.onDragOver(e, pin);
+						}}
+						className="fullHeightFlex"
+						draggableId={pin.uuid}
+						index={i}>
 						{cmp}
-					</FinsembleDraggable>);
+					</div>);
 			} else {
 				components.push(cmp);
 			}
@@ -332,6 +377,7 @@ export default class FinsembleToolbarSection extends React.Component {
 
 	}
 
+
 	componentWillUnmount() {
 		window.removeEventListener('resize', this.handleResize);
 		self.state.pinStore.removeListener({ field: 'pins' }, self.processPins);
@@ -369,13 +415,15 @@ export default class FinsembleToolbarSection extends React.Component {
 		</div>);
 		//If we can arrange the items, we need to wrap it in a droppable.
 		//@todo eventually we may allow vertical toolbars. When that happens this direction will need to be dynamic.
-		if (this.props.arrangeable) {
+		/*if (this.props.arrangeable) {
 			return (<FinsembleDroppable classes={classes} direction="horizontal" droppableId="droppable">
 				{section}
 			</FinsembleDroppable>);
 		} else {
 			return section;
-		}
+		}*/
+
+		return section;
 
 	}
 }

@@ -283,7 +283,7 @@ export default class Button extends React.Component {
 
 		//Render icon.
 		if (this.props.icon) {
-			image = (<img draggable={draggable} onDragStart={this.props.onDragStart} onDragEnd={this.props.onDragEnd} className={iconClasses} src={this.props.icon} />);
+			image = (<img draggable={draggable} onDragStart={this.props.onDragStart} onDrag={this.props.onDrag} onDragEnd={this.props.onDragEnd} className={iconClasses} src={this.props.icon} />);
 		}
 		//coerce to array.
 		if (typeof types === 'string') {
@@ -304,7 +304,7 @@ export default class Button extends React.Component {
 			if (types.includes('Toolbar')) {
 				buttonClasses += 'finsemble-toolbar-button-label';
 			}
-			label = <ButtonLabel draggable={draggable} onDragStart={this.props.onDragStart} onDragEnd={this.props.onDragEnd} className={buttonClasses} align={iconPosition === 'left' ? 'right' : 'left'} label={this.props.label} />;
+			label = <ButtonLabel draggable={draggable} onDragStart={this.props.onDragStart} onDrag={this.props.onDrag} onDragEnd={this.props.onDragEnd} className={buttonClasses} align={iconPosition === 'left' ? 'right' : 'left'} label={this.props.label} />;
 		}
 
 
