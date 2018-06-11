@@ -308,30 +308,14 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	onDragStart(e, pin) {
+		if (this.dragging) return; //prevent bad situations from unspawned windows
 		if (pin.type == "componentLauncher") {
-			if (!this.configCache[pin.component]) {
-				this.configCache[pin.component] = {
-					height: 600, width: 800
-				};
-				FSBL.Clients.ConfigClient.getValue({ field: "finsemble.components." + pin.component + ".window" }, (err, response) => {
-					if (response) Object.assign(this.configCache[pin.component], response); //makes sure we always have a height and width
-				});
-			}
-			if (FSBL.Clients.WindowClient.startTilingOrTabbing) FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true });
-			if (this.props.dragScrim) {
-				let img = new Image();
-				img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
-				e.dataTransfer.setDragImage(img, 0, 0);
-				this.startMouseTracking(pin.component);
-				if (this.props.groupMask) {
-					this.props.groupMask.addEventListener("shown", this.groupMaskShown);
-					this.props.groupMask.addEventListener("hidden", this.groupMaskHidden);
-				}
-			} else if (this.props.dragImage) {
-				e.dataTransfer.setDragImage(this.props.dragImage, 0, 0);
-			}
+			this.draggedGuid = Date.now() + '_' + Math.random();
+			if (FSBL.Clients.WindowClient.startTilingOrTabbing) FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
+			e.dataTransfer.setData("text/json", JSON.stringify({ waitForIdentifier: true, guid: this.draggedGuid }));
+		} else {
+			e.dataTransfer.setData("text/json", JSON.stringify(pin));
 		}
-		e.dataTransfer.setData("text/json", JSON.stringify(pin));
 
 		console.log('dragstart', pin);
 		this.dragging = true;
@@ -348,7 +332,6 @@ export default class FinsembleToolbarSection extends React.Component {
 
 	onDragEnd(e, pin) { //If no drop happened, then we need to spawn component if required
 		if (this.dragging) {
-			this.dragging = false;
 			if (pin.type == "componentLauncher") {
 
 				let spawnParams = Object.assign({}, pin.params);
@@ -358,8 +341,10 @@ export default class FinsembleToolbarSection extends React.Component {
 				if (!spawnParams.options) spawnParams.options = {};
 				spawnParams.options.autoShow = false;
 				delete spawnParams.monitor;
-				FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, function (err, response) {
+				FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, (err, response) => {
 					if (FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing) FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing({ windowIdentifier: response.windowIdentifier });
+					FSBL.Clients.RouterClient.publish('Finsemble.' + this.draggedGuid, response.windowIdentifier);
+					this.dragging = false;
 				});
 				if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
 			}
