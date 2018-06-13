@@ -309,6 +309,7 @@ export default class FinsembleToolbarSection extends React.Component {
 
 	onDragStart(e, pin) {
 		if (this.dragging) return; //prevent bad situations from unspawned windows
+		this.dragging = true;
 		if (pin.type == "componentLauncher") {
 			this.draggedGuid = Date.now() + '_' + Math.random();
 			if (FSBL.Clients.WindowClient.startTilingOrTabbing) FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
@@ -318,8 +319,6 @@ export default class FinsembleToolbarSection extends React.Component {
 		}
 
 		console.log('dragstart', pin);
-		this.dragging = true;
-
 	}
 
 	onDragOver(e, pin) {
@@ -353,7 +352,6 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	onDrop(e, pin) {
-		this.dragging = false;
 		let sourcePin = JSON.parse(e.dataTransfer.getData('text/json'));
 		console.log('drop', pin, sourcePin);
 		let pins = [];
@@ -369,6 +367,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		if (pin.type == "componentLauncher") {
 			if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
 		}
+		this.dragging = false;
 	}
 
 	/**
