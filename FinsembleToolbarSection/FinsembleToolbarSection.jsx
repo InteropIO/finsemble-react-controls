@@ -315,7 +315,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			this.draggedGuid = Date.now() + '_' + Math.random();
 			this.tiling = { state: "started", pin: pin };
 			console.log("start tiling on drag start");
-			let data = Object.assign({ waitForIdentifier: true, componentType: pin.component }, pin);
+			let data = Object.assign({ waitForIdentifier: true, componentType: pin.component, guid: this.draggedGuid }, pin);
 			FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
 			e.dataTransfer.setData("text/json", JSON.stringify(data));
 		} else {
