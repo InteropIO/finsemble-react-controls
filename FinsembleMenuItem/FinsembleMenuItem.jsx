@@ -80,6 +80,10 @@ export default class FinsembleMenuItem extends React.Component {
 			label = (
 				<FinsembleMenuItemLabel
 					menuItemProps={this.props}
+					draggable={this.props.draggable}
+					onDragStart={this.props.onDragStart}
+					onDrag={this.props.onDrag}
+					onDragEnd={this.props.onDragEnd}
 					onClick={this.props.onClick || this.props.onLabelClick}
 					className="menu-item-label-fullwidth"
 					label={this.props.label} />
