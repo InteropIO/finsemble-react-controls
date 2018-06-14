@@ -40,6 +40,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.onDrag = this.onDrag.bind(this);
 		this.onDragEnd = this.onDragEnd.bind(this);
 		this.onDragOver = this.onDragOver.bind(this);
+		this.onMouseLeave = this.onMouseLeave.bind(this);
 		this.groupMaskShown = this.groupMaskShown.bind(this);
 		this.groupMaskHidden = this.groupMaskHidden.bind(this);
 		this.configCache = {};
@@ -310,10 +311,13 @@ export default class FinsembleToolbarSection extends React.Component {
 	onDragStart(e, pin) {
 		if (this.dragging) return; //prevent bad situations from unspawned windows
 		this.dragging = true;
-		if (pin.type == "componentLauncher") {
+		if (pin.type == "componentLauncher" && FSBL.Clients.WindowClient.startTilingOrTabbing) {
 			this.draggedGuid = Date.now() + '_' + Math.random();
-			if (FSBL.Clients.WindowClient.startTilingOrTabbing) FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
-			e.dataTransfer.setData("text/json", JSON.stringify({ waitForIdentifier: true, guid: this.draggedGuid }));
+			this.tiling = { state: "started", pin: pin };
+			console.log("start tiling on drag start");
+			let data = Object.assign({ waitForIdentifier: true, componentType: pin.component }, pin);
+			FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
+			e.dataTransfer.setData("text/json", JSON.stringify(data));
 		} else {
 			e.dataTransfer.setData("text/json", JSON.stringify(pin));
 		}
@@ -322,7 +326,20 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	onDragOver(e, pin) {
+		/*if (this.tiling && this.tiling.state != "paused") {
+			console.log("pause tiling on drag over");
+			FSBL.Clients.WindowClient.cancelTilingOrTabbing();
+			this.tiling.state = "paused";
+		}*/
 		e.preventDefault();
+	}
+
+	onMouseLeave(e) {
+		/*if (this.tiling && this.tiling.state == "paused") {
+			console.log("start tiling on mouse leave");
+			if (FSBL.Clients.WindowClient.startTilingOrTabbing) FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: this.tiling.pin.component });
+			this.tiling.state = "started";
+		}*/
 	}
 
 	onDrag(e, pin) {
@@ -331,8 +348,7 @@ export default class FinsembleToolbarSection extends React.Component {
 
 	onDragEnd(e, pin) { //If no drop happened, then we need to spawn component if required
 		if (this.dragging) {
-			if (pin.type == "componentLauncher") {
-
+			if (pin.type == "componentLauncher" && this.tiling) {
 				let spawnParams = Object.assign({}, pin.params);
 				spawnParams.top = e.screenY;
 				spawnParams.left = e.screenX;
@@ -342,31 +358,40 @@ export default class FinsembleToolbarSection extends React.Component {
 				delete spawnParams.monitor;
 				FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, (err, response) => {
 					if (FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing) FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing({ windowIdentifier: response.windowIdentifier });
+					console.log("send identifier for tiling/tabbing");
 					FSBL.Clients.RouterClient.publish('Finsemble.' + this.draggedGuid, response.windowIdentifier);
 					this.dragging = false;
 				});
+				console.log("stop tiling on drag end");
 				if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
+				this.tiling = null;
 			}
 		}
 		console.log('dragend', pin);
 	}
 
 	onDrop(e, pin) {
-		let sourcePin = JSON.parse(e.dataTransfer.getData('text/json'));
-		console.log('drop', pin, sourcePin);
+		if (pin.type == "componentLauncher" && this.tiling) {
+			this.tiling = null;
+			console.log("cancel tiling on drop");
+			if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
+		}
+		let sourcePinData = JSON.parse(e.dataTransfer.getData('text/json'));
 		let pins = [];
 		for (var i = 0; i < this.state.pins.length; i++) {
 			pins[i] = this.state.pins[i];
 		}
+
+		let sourcePin = pins[sourcePinData.index];
+		console.log('drop', pin, sourcePin);
+
 		pins[sourcePin.index] = pin;
 		pins[pin.index] = sourcePin;
 		pin.index = sourcePin.index;
 		sourcePin.index = pin.index;
 		this.processPins(null, { value: pins });
 		//this.pinStore.setValue({ field: 'pins', value: pins });
-		if (pin.type == "componentLauncher") {
-			if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
-		}
+
 		this.dragging = false;
 	}
 
@@ -494,7 +519,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.children = this.props.handlePins ? this.renderpins() : this.props.children;
 		var OverflowComponent = this.state.overflowMenuComponent;
 		var self = this;
-		var section = (<div className={classes} ref={(e) => { this.element = e; }}>
+		var section = (<div className={classes} ref={(e) => { this.element = e; }} onMouseLeave={(e) => this.onMouseLeave(e)}>
 			{Array.isArray(this.children) && this.children.map((item, index) => {
 				if (self.state.minOverflowIndex && index >= self.state.minOverflowIndex) {
 					var comps = [];
