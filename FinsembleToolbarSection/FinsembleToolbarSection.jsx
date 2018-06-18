@@ -317,9 +317,9 @@ export default class FinsembleToolbarSection extends React.Component {
 			console.log("start tiling on drag start");
 			let data = Object.assign({ waitForIdentifier: true, componentType: pin.component, guid: this.draggedGuid }, pin);
 			FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
-			e.dataTransfer.setData("text/json", JSON.stringify(data));
+			e.dataTransfer.setData("text/plain", JSON.stringify(data));
 		} else {
-			e.dataTransfer.setData("text/json", JSON.stringify(pin));
+			e.dataTransfer.setData("text/plain", JSON.stringify(pin));
 		}
 
 		console.log('dragstart', pin);
@@ -376,7 +376,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			console.log("cancel tiling on drop");
 			if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
 		}
-		let sourcePinData = JSON.parse(e.dataTransfer.getData('text/json'));
+		let sourcePinData = JSON.parse(e.dataTransfer.getData('text/plain'));
 		let pins = [];
 		for (var i = 0; i < this.state.pins.length; i++) {
 			pins[i] = this.state.pins[i];
