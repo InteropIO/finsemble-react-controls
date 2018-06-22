@@ -40,6 +40,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.onDrag = this.onDrag.bind(this);
 		this.onDragEnd = this.onDragEnd.bind(this);
 		this.onDragOver = this.onDragOver.bind(this);
+		this.onDrop = this.onDrop.bind(this);
 		this.onMouseLeave = this.onMouseLeave.bind(this);
 		this.groupMaskShown = this.groupMaskShown.bind(this);
 		this.groupMaskHidden = this.groupMaskHidden.bind(this);
