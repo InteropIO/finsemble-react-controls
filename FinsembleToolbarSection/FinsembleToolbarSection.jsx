@@ -67,7 +67,7 @@ export default class FinsembleToolbarSection extends React.Component {
 				let pin = obj[i];
 				if (!pin) continue;
 				if (typeof (pin.index) === 'undefined') {
-					pin.index = arr.length;
+					pin.index = Object.keys(obj).length;
 				}
 				arr[pin.index] = pin;
 			}
@@ -383,13 +383,18 @@ export default class FinsembleToolbarSection extends React.Component {
 			pins[i] = this.state.pins[i];
 		}
 
-		let sourcePin = pins[sourcePinData.index];
+		// remove pin
+		let sourcePin = pins.splice(sourcePinData.index, 1)[0];
 		console.log('drop', pin, sourcePin);
 
-		pins[sourcePin.index] = pin;
-		pins[pin.index] = sourcePin;
-		pin.index = sourcePin.index;
-		sourcePin.index = pin.index;
+		// reinsert in proper position
+		pins.splice(pin.index, 0, sourcePin);
+
+		// reset all the indexes after reorder
+		for (var i = 0; i < pins.length; i++) {
+			pins[i].index = i;
+		}
+
 		this.processPins(null, { value: pins });
 		//this.pinStore.setValue({ field: 'pins', value: pins });
 
