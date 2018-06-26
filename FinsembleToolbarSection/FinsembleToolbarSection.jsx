@@ -357,14 +357,23 @@ export default class FinsembleToolbarSection extends React.Component {
 				if (!spawnParams.options) spawnParams.options = {};
 				spawnParams.options.autoShow = false;
 				delete spawnParams.monitor;
-				FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, (err, response) => {
-					if (FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing) FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing({ windowIdentifier: response.windowIdentifier });
-					console.log("send identifier for tiling/tabbing");
-					FSBL.Clients.RouterClient.publish('Finsemble.' + this.draggedGuid, response.windowIdentifier);
+				if (!this.mouseInWindow({
+					x: e.screenX,
+					y: e.screenY
+				})) {
+					FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, (err, response) => {
+						if (FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing) FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing({ windowIdentifier: response.windowIdentifier });
+						console.log("send identifier for tiling/tabbing");
+						FSBL.Clients.RouterClient.publish('Finsemble.' + this.draggedGuid, response.windowIdentifier);
+						this.dragging = false;
+					});
+					if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
+					console.log("stop tiling on drag end");
+				} else {
+					if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
+					console.log("cancel tiling on drag end");
 					this.dragging = false;
-				});
-				console.log("stop tiling on drag end");
-				if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
+				}
 				this.tiling = null;
 			}
 		}
@@ -377,6 +386,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			console.log("cancel tiling on drop");
 			if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
 		}
+		this.dragging = false;
 		let sourcePinData = JSON.parse(e.dataTransfer.getData('text/plain'));
 		let pins = [];
 		for (var i = 0; i < this.state.pins.length; i++) {
@@ -398,7 +408,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.processPins(null, { value: pins });
 		//this.pinStore.setValue({ field: 'pins', value: pins });
 
-		this.dragging = false;
+
 	}
 
 	/**
