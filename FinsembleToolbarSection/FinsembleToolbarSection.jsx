@@ -67,7 +67,7 @@ export default class FinsembleToolbarSection extends React.Component {
 				let pin = obj[i];
 				if (!pin) continue;
 				if (typeof (pin.index) === 'undefined') {
-					pin.index = arr.length;
+					pin.index = Object.keys(obj).length;
 				}
 				arr[pin.index] = pin;
 			}
