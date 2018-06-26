@@ -383,12 +383,18 @@ export default class FinsembleToolbarSection extends React.Component {
 			pins[i] = this.state.pins[i];
 		}
 
-		let sourcePin = pins[sourcePinData.index];
+		// remove pin
+		let sourcePin = pins.splice(sourcePinData.index, 1)[0];
 		console.log('drop', pin, sourcePin);
 
-		let swapPin = pins.splice(pin.index, 1);
+		// reinsert in proper position
 		pins.splice(pin.index, 0, sourcePin);
-		
+
+		// reset all the indexes after reorder
+		for (var i = 0; i < pins.length; i++) {
+			pins[i].index = i;
+		}
+
 		this.processPins(null, { value: pins });
 		//this.pinStore.setValue({ field: 'pins', value: pins });
 
