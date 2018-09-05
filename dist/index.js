@@ -1573,7 +1573,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 
 		//Render icon.
 		if (this.props.icon) {
-			image = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { draggable: draggable, className: iconClasses, src: this.props.icon });
+			image = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('img', { draggable: draggable, onDragStart: this.props.onDragStart, onDrag: this.props.onDrag, onDragEnd: this.props.onDragEnd, className: iconClasses, src: this.props.icon });
 		}
 		//coerce to array.
 		if (typeof types === 'string') {
@@ -1594,7 +1594,7 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 			if (types.includes('Toolbar')) {
 				buttonClasses += 'finsemble-toolbar-button-label';
 			}
-			label = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__FinsembleButtonLabel_FinsembleButtonLabel__["a" /* default */], { className: buttonClasses, align: iconPosition === 'left' ? 'right' : 'left', label: this.props.label });
+			label = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__FinsembleButtonLabel_FinsembleButtonLabel__["a" /* default */], { draggable: draggable, onDragStart: this.props.onDragStart, onDrag: this.props.onDrag, onDragEnd: this.props.onDragEnd, className: buttonClasses, align: iconPosition === 'left' ? 'right' : 'left', label: this.props.label });
 		}
 
 		if (types.length) {
@@ -5250,7 +5250,7 @@ class FinsembleButtonLabel extends __WEBPACK_IMPORTED_MODULE_0_react___default.a
 		classes += ` ${BUTTON_BASE_CLASS} ${labelClass}`;
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
-			{ className: classes },
+			{ draggable: this.props.draggable, onDragStart: this.props.onDragStart, onDragEnd: this.props.onDragEnd, className: classes },
 			this.props.label
 		);
 	}
@@ -5427,7 +5427,6 @@ class FinsembleMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
      */
 	cacheBounds() {
 		this.finWindow.getBounds(bounds => {
-			console.log(bounds, 'cache');
 			this.setState({
 				bounds: bounds
 			});
@@ -5439,6 +5438,7 @@ class FinsembleMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
      * @memberof FinsembleMenu
      */
 	componentDidMount() {
+		debugger; //eslint-disable-line
 		if (this.padding) {
 			FSBL.Clients.WindowClient.fitToDOM({
 				padding: this.padding
@@ -5558,6 +5558,10 @@ class FinsembleMenuItem extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Co
 		if (this.props.label) {
 			label = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__FinsembleMenuItemLabel_FinsembleMenuItemLabel__["a" /* default */], {
 				menuItemProps: this.props,
+				draggable: this.props.draggable,
+				onDragStart: this.props.onDragStart,
+				onDrag: this.props.onDrag,
+				onDragEnd: this.props.onDragEnd,
 				onClick: this.props.onClick || this.props.onLabelClick,
 				className: 'menu-item-label-fullwidth',
 				label: this.props.label });
@@ -19683,12 +19687,8 @@ class FinsembleToolbar extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 
 		super(props);
 		this.props = props;
-		if (this.props.onDragEnd) {
-			this.onDragEnd = this.props.onDragEnd;
-		} else {
-			//...
-			this.onDragEnd = () => {};
-		}
+		this.onDragEnd = this.props.onDragEnd ? this.props.onDragEnd : () => {};
+		this.onDragStart = this.props.onDragStart ? this.props.onDragStart : () => {};
 	}
 
 	render() {
@@ -19697,7 +19697,7 @@ class FinsembleToolbar extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Com
 
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			__WEBPACK_IMPORTED_MODULE_1__FinsembleDnDContext_FinsembleDnDContext__["a" /* default */],
-			{ onDragEnd: this.onDragEnd },
+			{ onDragEnd: this.onDragEnd, onDragStart: this.onDragStart },
 			__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 				'div',
 				{ className: classes },
@@ -19744,21 +19744,33 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 
 const SECTION_BASE_CLASS = 'finsemble-toolbar-section';
-
+const DEFAULT_MINIMUM_OVERFLOW = 10000000;
 // Put the thing into the DOM!
 class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___default.a.Component {
 	constructor(props) {
 		super(props);
 		this.props = props;
 		this.state = {
+			overflow: [],
 			pins: [],
 			clickChannel: this.props.clickChannel || FSBL.Clients.WindowClient.windowName + '-overflow-clickChannel'
 		};
-		var self = this;
 
 		this.reorderPins = this.reorderPins.bind(this);
 		this.processPins = this.processPins.bind(this);
 		this.handleResize = this.handleResize.bind(this);
+		this.onDragStart = this.onDragStart.bind(this);
+		this.onDrag = this.onDrag.bind(this);
+		this.onDragEnd = this.onDragEnd.bind(this);
+		this.onDragOver = this.onDragOver.bind(this);
+		this.onDrop = this.onDrop.bind(this);
+		this.onMouseLeave = this.onMouseLeave.bind(this);
+		this.groupMaskShown = this.groupMaskShown.bind(this);
+		this.groupMaskHidden = this.groupMaskHidden.bind(this);
+		this.configCache = {};
+		finsembleWindow.getBounds((err, bounds) => {
+			this.windowBounds = bounds;
+		});
 	}
 
 	/**
@@ -19779,7 +19791,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 				let pin = obj[i];
 				if (!pin) continue;
 				if (typeof pin.index === 'undefined') {
-					pin.index = arr.length;
+					pin.index = Object.keys(obj).length;
 				}
 				arr[pin.index] = pin;
 			}
@@ -19849,7 +19861,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
   * @param {*} e
   */
 	handleResize(e) {
-		this.setState({ minOverflowIndex: 10000000 });
+		this.setState({ minOverflowIndex: DEFAULT_MINIMUM_OVERFLOW });
 	}
 
 	/**
@@ -19858,7 +19870,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
      * @param {number} index
      * @memberof FinsembleToolbarSection
      */
-	triggerClick(index) {
+	triggerClick(index, element) {
 		function getToolbarButton(el) {
 			if (el.children) {
 				for (let i = 0; i < el.children.length; i++) {
@@ -19872,7 +19884,8 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 			}
 			return null;
 		}
-		let toolbarButton = getToolbarButton(this.element.children[index + 1]);
+		if (!element) element = this.element.children[index + 1];
+		let toolbarButton = getToolbarButton(element);
 		if (toolbarButton) {
 			toolbarButton.click();
 		} else {
@@ -19888,7 +19901,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
      */
 	hasOverflow() {
 		var e = this.element;
-		if (e.offsetWidth == 0) return false;
+		if (e.offsetWidth === 0) return false;
 		return e.offsetWidth < e.scrollWidth - 40;
 	}
 
@@ -19920,6 +19933,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 			});
 		});
 	}
+
 	/**
   * When the overflow menu or toolbar section reorders items, we send an event off to the global toolbar store, which reorders the pins. Then it sets the value on the global store, which we receive, and rerender.
   * @param {*} changeEvent
@@ -19949,22 +19963,170 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 			var e = self.element;
 			var right = e.offsetLeft + e.offsetWidth - 40;
 			var overflow = [];
-			var minOverflowIndex = 10000000;
+			var minOverflowIndex = DEFAULT_MINIMUM_OVERFLOW;
 			for (var i = 0; i < e.children.length; i++) {
 				var item = e.children[i];
-				if (item.offsetLeft + item.offsetWidth > right) {
+				if (minOverflowIndex === DEFAULT_MINIMUM_OVERFLOW && item.offsetLeft + item.offsetWidth > right) {
 					minOverflowIndex = i;
 				}
 				if (i >= minOverflowIndex) {
 					overflow.push({ item: getComponentProps(self.children[i]), index: i });
 				}
 			}
+
+			if (overflow.length === self.state.overflow.length && self.state.minOverflowIndex === minOverflowIndex) return;
+
 			self.setState({
 				overflow: overflow,
 				minOverflowIndex: overflow[0] ? overflow[0].index : minOverflowIndex
 			});
 		}
 	}
+
+	mouseInWindow(mp) {
+		if (mp.x >= this.windowBounds.left && mp.x <= this.windowBounds.right && mp.y >= this.windowBounds.top && mp.y <= this.windowBounds.bottom) {
+			console.log('mouse is in window');
+			return true;
+		}
+		console.log('mouse is in not window');
+		return false;
+	}
+
+	startMouseTracking(component) {
+		finsembleWindow.getBounds((err, bounds) => {
+			this.windowBounds = bounds;
+		});
+		FSBL.System.getMousePosition((err, mp) => {
+			mp.height = this.configCache[component].height;
+			mp.width = this.configCache[component].width;
+			if (this.dragging) {
+				let mouseInWindow = this.mouseInWindow(mp);
+				if (!this.dragScrimVisible && !this.groupMaskVisible && !mouseInWindow) {
+					this.props.dragScrim.show();
+					this.dragScrimVisible = true;
+				} else if (this.dragScrimVisible && (this.groupMaskVisible || mouseInWindow)) {
+					this.props.dragScrim.hide();
+					this.dragScrimVisible = false;
+				}
+				if (this.dragScrimVisible) {
+					this.props.dragScrim.setBounds(mp);
+				}
+
+				setTimeout(() => {
+					this.startMouseTracking(component);
+				}, 10);
+			} else {
+				this.props.dragScrim.hide();
+				this.dragScrimVisible = false;
+				if (this.props.groupMask) {
+					this.props.groupMask.removeEventListener('shown', this.groupMaskShown);
+					this.props.groupMask.removeEventListener('hidden', this.groupMaskHidden);
+				}
+			}
+		});
+	}
+
+	groupMaskShown() {
+		this.groupMaskVisible = true;
+	}
+
+	groupMaskHidden() {
+		this.groupMaskVisible = false;
+	}
+
+	onDragStart(e, pin) {
+		if (this.dragging) return; //prevent bad situations from unspawned windows
+		this.dragging = true;
+		if (pin.type == 'componentLauncher' && FSBL.Clients.WindowClient.startTilingOrTabbing) {
+			this.draggedGuid = Date.now() + '_' + Math.random();
+			this.tiling = { state: 'started', pin: pin };
+			console.log('start tiling on drag start');
+			let data = Object.assign({ waitForIdentifier: true, componentType: pin.component, guid: this.draggedGuid }, pin);
+			FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
+			e.dataTransfer.setData('text/plain', JSON.stringify(data));
+		} else {
+			e.dataTransfer.setData('text/plain', JSON.stringify(pin));
+		}
+
+		console.log('dragstart', pin);
+	}
+
+	onDragOver(e, pin) {
+		/*if (this.tiling && this.tiling.state != "paused") {
+  	console.log("pause tiling on drag over");
+  	FSBL.Clients.WindowClient.cancelTilingOrTabbing();
+  	this.tiling.state = "paused";
+  }*/
+		e.preventDefault();
+	}
+
+	onMouseLeave(e) {
+		/*if (this.tiling && this.tiling.state == "paused") {
+  	console.log("start tiling on mouse leave");
+  	if (FSBL.Clients.WindowClient.startTilingOrTabbing) FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: this.tiling.pin.component });
+  	this.tiling.state = "started";
+  }*/
+	}
+
+	onDrag(e, pin) {
+		//console.log('drag', pin, e.screenX, e.screenY );
+	}
+
+	onDragEnd(e, pin) {
+		//If no drop happened, then we need to spawn component if required
+		if (this.dragging) {
+			if (pin.type == 'componentLauncher' && this.tiling) {
+				let spawnParams = Object.assign({}, pin.params);
+				spawnParams.top = e.screenY;
+				spawnParams.left = e.screenX;
+				spawnParams.position = 'virtual';
+				if (!spawnParams.options) spawnParams.options = {};
+				spawnParams.options.autoShow = false;
+				delete spawnParams.monitor;
+				FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, (err, response) => {
+					if (FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing) FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing({ windowIdentifier: response.windowIdentifier });
+					console.log('send identifier for tiling/tabbing');
+					FSBL.Clients.RouterClient.publish('Finsemble.' + this.draggedGuid, response.windowIdentifier);
+					this.dragging = false;
+				});
+				console.log('stop tiling on drag end');
+				if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
+				this.tiling = null;
+			}
+		}
+		console.log('dragend', pin);
+	}
+
+	onDrop(e, pin) {
+		if (pin.type == 'componentLauncher' && this.tiling) {
+			this.tiling = null;
+			console.log('cancel tiling on drop');
+			if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
+		}
+		let sourcePinData = JSON.parse(e.dataTransfer.getData('text/plain'));
+		let pins = [];
+		for (var i = 0; i < this.state.pins.length; i++) {
+			pins[i] = this.state.pins[i];
+		}
+
+		// remove pin
+		let sourcePin = pins.splice(sourcePinData.index, 1)[0];
+		console.log('drop', pin, sourcePin);
+
+		// reinsert in proper position
+		pins.splice(pin.index, 0, sourcePin);
+
+		// reset all the indexes after reorder
+		for (var i = 0; i < pins.length; i++) {
+			pins[i].index = i;
+		}
+
+		this.processPins(null, { value: pins });
+		//this.pinStore.setValue({ field: 'pins', value: pins });
+
+		this.dragging = false;
+	}
+
 	/**
   * A convenience function to keep the render function semi-readable.
   * This iterates through each pin and figures out what kind of component it is. If the section is arrangeable, it renders finsembleDraggables.
@@ -19993,10 +20155,26 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 				components.push(
 				//Wrap the component with a FinsembleDraggable.
 				__WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(
-					__WEBPACK_IMPORTED_MODULE_0__FinsembleDraggable_FinsembleDraggable__["a" /* default */],
+					'div',
 					{
-						wrapperClass: 'fullHeightFlex',
-						draggableId: pin.uuid, index: i },
+						draggable: true,
+						onDragStart: e => {
+							this.onDragStart(e, pin);
+						},
+						onDrag: e => {
+							this.onDrag(e, pin);
+						},
+						onDragEnd: e => {
+							this.onDragEnd(e, pin);
+						},
+						onDrop: e => {
+							this.onDrop(e, pin);
+						},
+						onDragOver: e => {
+							this.onDragOver(e, pin);
+						},
+						className: 'fullHeightFlex',
+						index: i },
 					cmp
 				));
 			} else {
@@ -20078,7 +20256,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 			'div',
 			{ className: classes, ref: e => {
 					this.element = e;
-				} },
+				}, onMouseLeave: e => this.onMouseLeave(e) },
 			Array.isArray(this.children) && this.children.map((item, index) => {
 				if (self.state.minOverflowIndex && index >= self.state.minOverflowIndex) {
 					var comps = [];
@@ -20104,15 +20282,15 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 		);
 		//If we can arrange the items, we need to wrap it in a droppable.
 		//@todo eventually we may allow vertical toolbars. When that happens this direction will need to be dynamic.
-		if (this.props.arrangeable) {
-			return __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(
-				__WEBPACK_IMPORTED_MODULE_1__FinsembleDroppable_FinsembleDroppable__["a" /* default */],
-				{ classes: classes, direction: 'horizontal', droppableId: 'droppable' },
-				section
-			);
-		} else {
-			return section;
-		}
+		/*if (this.props.arrangeable) {
+  	return (<FinsembleDroppable classes={classes} direction="horizontal" droppableId="droppable">
+  		{section}
+  	</FinsembleDroppable>);
+  } else {
+  	return section;
+  }*/
+
+		return section;
 	}
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = FinsembleToolbarSection;

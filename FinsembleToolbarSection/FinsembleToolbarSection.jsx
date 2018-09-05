@@ -22,13 +22,14 @@ import FinsembleDroppable from '../FinsembleDroppable/FinsembleDroppable';
 import React from 'react';
 import FinsembleButton from '../FinsembleButton/FinsembleButton';
 const SECTION_BASE_CLASS = 'finsemble-toolbar-section';
-
+const DEFAULT_MINIMUM_OVERFLOW = 10000000;
 // Put the thing into the DOM!
 export default class FinsembleToolbarSection extends React.Component {
 	constructor(props) {
 		super(props);
 		this.props = props;
 		this.state = {
+			overflow: [],
 			pins: [],
 			clickChannel: this.props.clickChannel || FSBL.Clients.WindowClient.windowName + '-overflow-clickChannel'
 		};
@@ -47,7 +48,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.configCache = {};
 		finsembleWindow.getBounds((err, bounds) => {
 			this.windowBounds = bounds;
-		})
+		});
 
 	}
 
@@ -136,7 +137,7 @@ export default class FinsembleToolbarSection extends React.Component {
 	 * @param {*} e
 	 */
 	handleResize(e) {
-		this.setState({ minOverflowIndex: 10000000 });
+		this.setState({ minOverflowIndex: DEFAULT_MINIMUM_OVERFLOW });
 	}
 
 	/**
@@ -176,7 +177,7 @@ export default class FinsembleToolbarSection extends React.Component {
      */
 	hasOverflow() {
 		var e = this.element;
-		if (e.offsetWidth == 0) return false;
+		if (e.offsetWidth === 0) return false;
 		return (e.offsetWidth < e.scrollWidth - 40);
 	}
 
@@ -240,16 +241,20 @@ export default class FinsembleToolbarSection extends React.Component {
 			var e = self.element;
 			var right = e.offsetLeft + e.offsetWidth - 40;
 			var overflow = [];
-			var minOverflowIndex = 10000000;
+			var minOverflowIndex = DEFAULT_MINIMUM_OVERFLOW;
 			for (var i = 0; i < e.children.length; i++) {
 				var item = e.children[i];
-				if ((item.offsetLeft + item.offsetWidth) > right) {
+				if (minOverflowIndex === DEFAULT_MINIMUM_OVERFLOW && (item.offsetLeft + item.offsetWidth) > right) {
 					minOverflowIndex = i;
 				}
 				if (i >= minOverflowIndex) {
 					overflow.push({ item: getComponentProps(self.children[i]), index: i });
 				}
 			}
+
+			if (overflow.length === self.state.overflow.length && self.state.minOverflowIndex === minOverflowIndex) return;
+
+
 			self.setState({
 				overflow: overflow,
 				minOverflowIndex: (overflow[0] ? overflow[0].index : minOverflowIndex)
@@ -259,17 +264,17 @@ export default class FinsembleToolbarSection extends React.Component {
 
 	mouseInWindow(mp) {
 		if (mp.x >= this.windowBounds.left && mp.x <= this.windowBounds.right && mp.y >= this.windowBounds.top && mp.y <= this.windowBounds.bottom) {
-			console.log("mouse is in window");
+			console.log('mouse is in window');
 			return true;
 		}
-		console.log("mouse is in not window");
+		console.log('mouse is in not window');
 		return false;
 	}
 
 	startMouseTracking(component) {
 		finsembleWindow.getBounds((err, bounds) => {
 			this.windowBounds = bounds;
-		})
+		});
 		FSBL.System.getMousePosition((err, mp) => {
 			mp.height = this.configCache[component].height;
 			mp.width = this.configCache[component].width;
@@ -294,8 +299,8 @@ export default class FinsembleToolbarSection extends React.Component {
 				this.props.dragScrim.hide();
 				this.dragScrimVisible = false;
 				if (this.props.groupMask) {
-					this.props.groupMask.removeEventListener("shown", this.groupMaskShown);
-					this.props.groupMask.removeEventListener("hidden", this.groupMaskHidden);
+					this.props.groupMask.removeEventListener('shown', this.groupMaskShown);
+					this.props.groupMask.removeEventListener('hidden', this.groupMaskHidden);
 				}
 			}
 		});
@@ -312,15 +317,15 @@ export default class FinsembleToolbarSection extends React.Component {
 	onDragStart(e, pin) {
 		if (this.dragging) return; //prevent bad situations from unspawned windows
 		this.dragging = true;
-		if (pin.type == "componentLauncher" && FSBL.Clients.WindowClient.startTilingOrTabbing) {
+		if (pin.type == 'componentLauncher' && FSBL.Clients.WindowClient.startTilingOrTabbing) {
 			this.draggedGuid = Date.now() + '_' + Math.random();
-			this.tiling = { state: "started", pin: pin };
-			console.log("start tiling on drag start");
+			this.tiling = { state: 'started', pin: pin };
+			console.log('start tiling on drag start');
 			let data = Object.assign({ waitForIdentifier: true, componentType: pin.component, guid: this.draggedGuid }, pin);
 			FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
-			e.dataTransfer.setData("text/plain", JSON.stringify(data));
+			e.dataTransfer.setData('text/plain', JSON.stringify(data));
 		} else {
-			e.dataTransfer.setData("text/plain", JSON.stringify(pin));
+			e.dataTransfer.setData('text/plain', JSON.stringify(pin));
 		}
 
 		console.log('dragstart', pin);
@@ -349,21 +354,21 @@ export default class FinsembleToolbarSection extends React.Component {
 
 	onDragEnd(e, pin) { //If no drop happened, then we need to spawn component if required
 		if (this.dragging) {
-			if (pin.type == "componentLauncher" && this.tiling) {
+			if (pin.type == 'componentLauncher' && this.tiling) {
 				let spawnParams = Object.assign({}, pin.params);
 				spawnParams.top = e.screenY;
 				spawnParams.left = e.screenX;
-				spawnParams.position = "virtual";
+				spawnParams.position = 'virtual';
 				if (!spawnParams.options) spawnParams.options = {};
 				spawnParams.options.autoShow = false;
 				delete spawnParams.monitor;
 				FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, (err, response) => {
 					if (FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing) FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing({ windowIdentifier: response.windowIdentifier });
-					console.log("send identifier for tiling/tabbing");
+					console.log('send identifier for tiling/tabbing');
 					FSBL.Clients.RouterClient.publish('Finsemble.' + this.draggedGuid, response.windowIdentifier);
 					this.dragging = false;
 				});
-				console.log("stop tiling on drag end");
+				console.log('stop tiling on drag end');
 				if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
 				this.tiling = null;
 			}
@@ -372,9 +377,9 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	onDrop(e, pin) {
-		if (pin.type == "componentLauncher" && this.tiling) {
+		if (pin.type == 'componentLauncher' && this.tiling) {
 			this.tiling = null;
-			console.log("cancel tiling on drop");
+			console.log('cancel tiling on drop');
 			if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
 		}
 		let sourcePinData = JSON.parse(e.dataTransfer.getData('text/plain'));
