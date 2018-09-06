@@ -262,6 +262,12 @@ export default class Button extends React.Component {
 			});
 		}
 	}
+	getRandomID() {
+		var S4 = function () {
+			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+		};
+		return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
+	}
 
 	render() {
 		//If the user doesn't want to show the component, return null.
@@ -336,7 +342,9 @@ export default class Button extends React.Component {
 			if (self._onClick) self._onClick(e);
 			if (self.props.afterClick) self.props.afterClick(e);
 		};
-		return (<div onMouseUp={this.props.onMouseUp}
+		return (<div
+			id={this.props.id || this.getRandomID()}
+			onMouseUp={this.props.onMouseUp}
 			onMouseDown={this.props.onMouseDown}
 			onClick={this.onClick}
 			title={this.props.title || ''}

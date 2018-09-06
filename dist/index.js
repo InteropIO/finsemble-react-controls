@@ -1552,6 +1552,12 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 			});
 		}
 	}
+	getRandomID() {
+		var S4 = function () {
+			return ((1 + Math.random()) * 0x10000 | 0).toString(16).substring(1);
+		};
+		return S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4();
+	}
 
 	render() {
 		//If the user doesn't want to show the component, return null.
@@ -1627,7 +1633,9 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
 		};
 		return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
 			'div',
-			{ onMouseUp: this.props.onMouseUp,
+			{
+				id: this.props.id || this.getRandomID(),
+				onMouseUp: this.props.onMouseUp,
 				onMouseDown: this.props.onMouseDown,
 				onClick: this.onClick,
 				title: this.props.title || '',
@@ -5427,6 +5435,7 @@ class FinsembleMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
      */
 	cacheBounds() {
 		this.finWindow.getBounds(bounds => {
+			console.log(bounds, 'cache');
 			this.setState({
 				bounds: bounds
 			});
@@ -5438,7 +5447,6 @@ class FinsembleMenu extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Compon
      * @memberof FinsembleMenu
      */
 	componentDidMount() {
-		debugger; //eslint-disable-line
 		if (this.padding) {
 			FSBL.Clients.WindowClient.fitToDOM({
 				padding: this.padding
