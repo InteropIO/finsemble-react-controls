@@ -19883,7 +19883,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
   * @param {*} e
   */
 	handleResize(e) {
-		this.setState({ minOverflowIndex: DEFAULT_MINIMUM_OVERFLOW });
+		this.setState({ minOverflowIndex: DEFAULT_MINIMUM_OVERFLOW, overflow: [] });
 	}
 
 	/**
@@ -19923,7 +19923,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
      */
 	hasOverflow() {
 		var e = this.element;
-		if (e.offsetWidth === 0) return false;
+		if (e === null || e.offsetWidth === 0) return false;
 		return e.offsetWidth < e.scrollWidth - 40;
 	}
 
@@ -20274,13 +20274,16 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 		this.children = this.props.handlePins ? this.renderpins() : this.props.children;
 		var OverflowComponent = this.state.overflowMenuComponent;
 		var self = this;
+		//section doesn't get rendered when it's so narrow that the first item would be clipped.
+		if (self.state.minOverflowIndex === 0) return __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement('span', null);
+
 		var section = __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(
 			'div',
 			{ className: classes, ref: e => {
 					this.element = e;
 				}, onMouseLeave: e => this.onMouseLeave(e) },
 			Array.isArray(this.children) && this.children.map((item, index) => {
-				if (self.state.minOverflowIndex && index >= self.state.minOverflowIndex) {
+				if (!isNaN(self.state.minOverflowIndex) && index >= self.state.minOverflowIndex) {
 					var comps = [];
 					// render the overflow component
 					if (index == self.state.minOverflowIndex) {
