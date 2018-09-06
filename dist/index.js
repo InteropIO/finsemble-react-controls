@@ -1287,6 +1287,8 @@ exports.default = _assign2.default || function (target) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__FinsembleFontIcon_FinsembleFontIcon__ = __webpack_require__(55);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__FinsembleButtonLabel_FinsembleButtonLabel__ = __webpack_require__(97);
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 /*!
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
@@ -1319,17 +1321,21 @@ const classMap = {
  * @returns
  */
 function BoundingBoxRelativeToWindow(domElementClientRect) {
-	let boundingBox = {
-		top: FSBL.Clients.WindowClient.options.defaultTop - domElementClientRect.top,
-		left: FSBL.Clients.WindowClient.options.defaultLeft + domElementClientRect.left,
-		width: domElementClientRect.width,
-		height: domElementClientRect.height
-	};
+	function promiseResolver(resolve, reject) {
+		finsembleWindow.getBounds((err, bounds) => {
+			let boundingBox = {
+				top: bounds.top - domElementClientRect.top,
+				left: bounds.left + domElementClientRect.left,
+				width: domElementClientRect.width,
+				height: domElementClientRect.height
+			};
 
-	boundingBox.right = boundingBox.left + boundingBox.width;
-	boundingBox.bottom = boundingBox.top + boundingBox.height;
-
-	return boundingBox;
+			boundingBox.right = boundingBox.left + boundingBox.width;
+			boundingBox.bottom = boundingBox.top + boundingBox.height;
+			resolve(boundingBox);
+		});
+	}
+	return new Promise(promiseResolver);
 }
 
 /**
@@ -1428,24 +1434,32 @@ class Button extends __WEBPACK_IMPORTED_MODULE_0_react___default.a.Component {
    */
 		var onMenuShown = function (shownErr, shownResponse) {
 			if (shownResponse) {
-				let finWindow = shownResponse.finWindow;
-				var onMenuBlurred = function (blurErr, blurResponse) {
-					//On blur, check the mouse position. If click was inside of the button, we invalidate the click event that will be coming soon.
-					let clientRect = DOM.getBoundingClientRect();
-					let boundingBox = new BoundingBoxRelativeToWindow(clientRect);
-					//Assumption is that the blur happened elsewhere. If the blur happened on the button, we don't want to open the menu on click.
-					let openMenuOnClick = true;
-					fin.desktop.System.getMousePosition(position => {
-						//If the click was inside of the opening button's bounding rectangle, don't hide.
-						if (position.left > boundingBox.left && position.left < boundingBox.right && position.top < boundingBox.bottom && position.top > boundingBox.top) {
-							openMenuOnClick = false;
-						}
+				let onMenuBlurred = (() => {
+					var _ref = _asyncToGenerator(function* (blurErr, blurResponse) {
+						//On blur, check the mouse position. If click was inside of the button, we invalidate the click event that will be coming soon.
+						let clientRect = DOM.getBoundingClientRect();
+						let boundingBox = yield new BoundingBoxRelativeToWindow(clientRect);
+						//Assumption is that the blur happened elsewhere. If the blur happened on the button, we don't want to open the menu on click.
+						let openMenuOnClick = true;
+						fin.desktop.System.getMousePosition(function (position) {
+							//If the click was inside of the opening button's bounding rectangle, don't hide.
+							if (position.left > boundingBox.left && position.left < boundingBox.right && position.top < boundingBox.bottom && position.top > boundingBox.top) {
+								openMenuOnClick = false;
+							}
 
-						self.openMenuOnClick = openMenuOnClick;
-						console.log('LaunchMenu Post Blur', self.openMenuOnClick, boundingBox, position);
+							self.openMenuOnClick = openMenuOnClick;
+							console.log('LaunchMenu Post Blur', self.openMenuOnClick, boundingBox, position);
+						});
+						finWindow.removeEventListener('blurred', onMenuBlurred);
 					});
-					finWindow.removeEventListener('blurred', onMenuBlurred);
-				};
+
+					return function onMenuBlurred(_x, _x2) {
+						return _ref.apply(this, arguments);
+					};
+				})();
+
+				let finWindow = shownResponse.finWindow;
+				;
 				finWindow.addEventListener('blurred', onMenuBlurred);
 
 				//Our appLauncher is listening on this channel for items to populate it.
