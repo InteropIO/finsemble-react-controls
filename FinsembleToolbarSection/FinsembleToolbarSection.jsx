@@ -329,16 +329,17 @@ export default class FinsembleToolbarSection extends React.Component {
 	onDragStart(e, pin) {
 		if (this.dragging) return; //prevent bad situations from unspawned windows
 		this.dragging = true;
-		if (pin.type == 'componentLauncher' && FSBL.Clients.WindowClient.startTilingOrTabbing) {
-			this.draggedGuid = Date.now() + '_' + Math.random();
-			this.tiling = { state: 'started', pin: pin };
-			console.log('start tiling on drag start');
-			let data = Object.assign({ waitForIdentifier: true, componentType: pin.component, guid: this.draggedGuid }, pin);
-			FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
-			e.dataTransfer.setData('text/plain', JSON.stringify(data));
-		} else {
-			e.dataTransfer.setData('text/plain', JSON.stringify(pin));
-		}
+		//@brad commented out on 9/12. Not ready for release just yet.
+		// if (pin.type == 'componentLauncher' && FSBL.Clients.WindowClient.startTilingOrTabbing) {
+		// 	this.draggedGuid = Date.now() + '_' + Math.random();
+		// 	this.tiling = { state: 'started', pin: pin };
+		// 	console.log('start tiling on drag start');
+		// 	let data = Object.assign({ waitForIdentifier: true, componentType: pin.component, guid: this.draggedGuid }, pin);
+		// 	FSBL.Clients.WindowClient.startTilingOrTabbing({ waitForIdentifier: true, componentType: pin.component });
+		// 	e.dataTransfer.setData('text/plain', JSON.stringify(data));
+		// } else {
+		e.dataTransfer.setData('text/plain', JSON.stringify(pin));
+		// }
 
 		console.log('dragstart', pin);
 	}
