@@ -24,7 +24,7 @@ import FinsembleButton from '../FinsembleButton/FinsembleButton';
 const SECTION_BASE_CLASS = 'finsemble-toolbar-section';
 const DEFAULT_MINIMUM_OVERFLOW = 10000000;
 //The number of pixels to add to the calculation where we determine whether a component is overflowing. We subtract an additional 70 pixels to account for the padding between the last item and the overflow button. This way the overflow button never gets hidden behind the right section of the toolbar.
-const OVERFLOW_BUTTON_OFFSET = 58;
+const OVERFLOW_BUTTON_OFFSET = 55;
 export default class FinsembleToolbarSection extends React.Component {
 	constructor(props) {
 		super(props);
@@ -247,7 +247,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		if (self.hasOverflow()) {
 			var e = self.element;
 			//conservative estimate of the 'right' side of the item. We cut the item off before the overflow button can accidentally get hidden.
-			var right = e.clientLeft + e.clientWidth - OVERFLOW_BUTTON_OFFSET;
+			var right = e.offsetLeft + e.offsetWidth - OVERFLOW_BUTTON_OFFSET;
 			var overflow = [];
 			var minOverflowIndex = DEFAULT_MINIMUM_OVERFLOW;
 			for (var i = 0; i < e.children.length; i++) {

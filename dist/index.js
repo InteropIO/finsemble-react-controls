@@ -19991,12 +19991,12 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 		if (self.hasOverflow()) {
 			var e = self.element;
 			//conservative estimate of the 'right' side of the item. We cut the item off before the overflow button can accidentally get hidden.
-			var right = e.clientLeft + e.clientWidth + 50;
+			var right = e.offsetLeft + e.offsetWidth - OVERFLOW_BUTTON_OFFSET;
 			var overflow = [];
 			var minOverflowIndex = DEFAULT_MINIMUM_OVERFLOW;
 			for (var i = 0; i < e.children.length; i++) {
 				var item = e.children[i];
-				if (minOverflowIndex === DEFAULT_MINIMUM_OVERFLOW && item.clientLeft + item.clientWidth > right) {
+				if (minOverflowIndex === DEFAULT_MINIMUM_OVERFLOW && item.offsetLeft + item.offsetWidth > right) {
 					minOverflowIndex = i;
 				}
 				if (i >= minOverflowIndex) {
