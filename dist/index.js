@@ -20208,7 +20208,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 							this.onDragOver(e, pin);
 						},
 						className: 'fullHeightFlex',
-						index: i },
+						key: i },
 					cmp
 				));
 			} else {
@@ -20306,7 +20306,7 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 					// render the rest of the components hidden
 					comps.push(__WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(
 						'div',
-						{ style: { display: 'none' } },
+						{ key: index, style: { display: 'none' } },
 						item
 					));
 					if (self.element && !self.element.className.includes('overflow')) self.element.className += ' overflow';

@@ -462,7 +462,7 @@ export default class FinsembleToolbarSection extends React.Component {
 							this.onDragOver(e, pin);
 						}}
 						className="fullHeightFlex"
-						index={i}>
+						key={i}>
 						{cmp}
 					</div>);
 			} else {
@@ -557,7 +557,7 @@ export default class FinsembleToolbarSection extends React.Component {
 						comps.push(<OverflowComponent beforeClick={function (e) { self.saveButtonsToOverflowStore(e, self); }} {...self.state.overflowMenuProps} key={'overflow' + index} />);
 					}
 					// render the rest of the components hidden
-					comps.push(<div style={{ display: 'none' }}>{item}</div>);
+					comps.push(<div key={index} style={{ display: 'none' }}>{item}</div>);
 					if (self.element && !self.element.className.includes('overflow')) self.element.className += ' overflow';
 					return comps;
 				} else {
