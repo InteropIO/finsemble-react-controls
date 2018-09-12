@@ -19767,7 +19767,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 const SECTION_BASE_CLASS = 'finsemble-toolbar-section';
 const DEFAULT_MINIMUM_OVERFLOW = 10000000;
-// Put the thing into the DOM!
+//The number of pixels to add to the calculation where we determine whether a component is overflowing. We subtract an additional 70 pixels to account for the padding between the last item and the overflow button. This way the overflow button never gets hidden behind the right section of the toolbar.
+const OVERFLOW_BUTTON_OFFSET = 70;
 class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___default.a.Component {
 	constructor(props) {
 		super(props);
@@ -19923,8 +19924,14 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
      */
 	hasOverflow() {
 		var e = this.element;
+		//If the first element in the sectioin would be sent to the overflow menu, we don't render the section. In that case, e would be null.
 		if (e === null || e.offsetWidth === 0) return false;
-		return e.offsetWidth < e.scrollWidth - 40;
+		let offset = 0;
+		//If we already have an overflow, we should account for the overflow button in our calculations.
+		if (this.state.minOverflowIndex !== DEFAULT_MINIMUM_OVERFLOW) {
+			offset = 20;
+		}
+		return e.offsetWidth < e.scrollWidth - offset;
 	}
 
 	/**
@@ -19983,7 +19990,8 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 		}
 		if (self.hasOverflow()) {
 			var e = self.element;
-			var right = e.offsetLeft + e.offsetWidth - 40;
+			//conservative estimate of the 'right' side of the item. We cut the item off before the overflow button can accidentally get hidden.
+			var right = e.offsetLeft + e.offsetWidth - OVERFLOW_BUTTON_OFFSET;
 			var overflow = [];
 			var minOverflowIndex = DEFAULT_MINIMUM_OVERFLOW;
 			for (var i = 0; i < e.children.length; i++) {
@@ -19992,7 +20000,10 @@ class FinsembleToolbarSection extends __WEBPACK_IMPORTED_MODULE_2_react___defaul
 					minOverflowIndex = i;
 				}
 				if (i >= minOverflowIndex) {
-					overflow.push({ item: getComponentProps(self.children[i]), index: i });
+					//On quick resizes, this can get out of sync. e.g., minOverflowIndex could be 4, but we might only have 3 elements to render.
+					if (self.children[i]) {
+						overflow.push({ item: getComponentProps(self.children[i]), index: i });
+					}
 				}
 			}
 
