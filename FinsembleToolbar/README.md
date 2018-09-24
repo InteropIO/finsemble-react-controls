@@ -1,7 +1,7 @@
 # FinsembleToolbar
 
 ## Overview
-This is a container designed to be a toolbar. The FinsembleToolbar is made up of [FinsembleToolbarSections](../FinsembleToolbarSection/README.md) and each section  contains other components or controls. Generally these are composed from [FinsembleButtons](../FinsembleButton/READMEmd). A [separator control](../FinsembleToolbarSeparator/README.md) is also available and you have the ability to use any custom controls.
+This is a container designed to be a toolbar. The FinsembleToolbar is made up of [FinsembleToolbarSections](../FinsembleToolbarSection/README.md) and each section  contains other components or controls. Generally these are composed from [FinsembleButtons](../FinsembleButton/README.md). A [separator control](../FinsembleToolbarSeparator/README.md) is also available and you have the ability to use any custom controls.
 
 ![](Toolbar.png)
 
