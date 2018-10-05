@@ -385,6 +385,7 @@ export default class FinsembleToolbarSection extends React.Component {
 				if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
 				this.tiling = null;
 			}
+			this.dragging = false;
 		}
 		console.log('dragend', pin);
 	}
@@ -395,7 +396,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			console.log('cancel tiling on drop');
 			if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
 		}
-		let sourcePinData = JSON.parse(e.dataTransfer.getData('text/plain'));
+		let sourcePinData = JSON.parse(e.dataTransfer.getData('text'));
 		let pins = [];
 		for (var i = 0; i < this.state.pins.length; i++) {
 			pins[i] = this.state.pins[i];
