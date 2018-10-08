@@ -275,7 +275,8 @@ export default class FinsembleToolbarSection extends React.Component {
 	}
 
 	mouseInWindow(mp) {
-		if (mp.x >= this.windowBounds.left && mp.x <= this.windowBounds.right && mp.y >= this.windowBounds.top && mp.y <= this.windowBounds.bottom) {
+		let border = 3;
+		if (mp.x >= (this.windowBounds.left+border) && mp.x <= (this.windowBounds.right-border) && mp.y >= (this.windowBounds.top+border) && mp.y <= (this.windowBounds.bottom-border)) {
 			console.log('mouse is in window');
 			return true;
 		}
@@ -375,14 +376,26 @@ export default class FinsembleToolbarSection extends React.Component {
 				if (!spawnParams.options) spawnParams.options = {};
 				spawnParams.options.autoShow = false;
 				delete spawnParams.monitor;
-				FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, (err, response) => {
-					if (FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing) FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing({ windowIdentifier: response.windowIdentifier });
-					console.log('send identifier for tiling/tabbing');
-					FSBL.Clients.RouterClient.publish('Finsemble.' + this.draggedGuid, response.windowIdentifier);
+				if (!this.mouseInWindow({
+					x: e.screenX,
+					y: e.screenY
+				})) {
+					FSBL.Clients.LauncherClient.spawn(pin.component, spawnParams, (err, response) => {
+						if (FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing) FSBL.Clients.WindowClient.sendIdentifierForTilingOrTabbing({ windowIdentifier: response.windowIdentifier });
+						console.log('send identifier for tiling/tabbing');
+						FSBL.Clients.RouterClient.publish('Finsemble.' + this.draggedGuid, response.windowIdentifier);
+						this.dragging = false;
+						if (FSBL.FinsembleWindow) FSBL.FinsembleWindow.wrap(response.windowIdentifier, (err, wrappedWindow) => { //make sure no invisible windows
+							wrappedWindow.show();
+						});
+					});
+					if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
+					console.log('stop tiling on drag end');
+				} else {
+					if (FSBL.Clients.WindowClient.cancelTilingOrTabbing) FSBL.Clients.WindowClient.cancelTilingOrTabbing();
+					console.log('cancel tiling on drag end');
 					this.dragging = false;
-				});
-				console.log('stop tiling on drag end');
-				if (FSBL.Clients.WindowClient.stopTilingOrTabbing) FSBL.Clients.WindowClient.stopTilingOrTabbing();
+				}
 				this.tiling = null;
 			}
 			this.dragging = false;
@@ -417,7 +430,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		this.processPins(null, { value: pins });
 		//this.pinStore.setValue({ field: 'pins', value: pins });
 
-		this.dragging = false;
+
 	}
 
 	/**
