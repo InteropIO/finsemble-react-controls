@@ -30,17 +30,21 @@ const classMap = {
  * @returns
  */
 function BoundingBoxRelativeToWindow(domElementClientRect) {
-	let boundingBox = {
-		top: FSBL.Clients.WindowClient.options.defaultTop - domElementClientRect.top,
-		left: FSBL.Clients.WindowClient.options.defaultLeft + domElementClientRect.left,
-		width: domElementClientRect.width,
-		height: domElementClientRect.height
-	};
+	function promiseResolver(resolve, reject) {
+		finsembleWindow.getBounds((err, bounds) => {
+			let boundingBox = {
+				top: bounds.top - domElementClientRect.top,
+				left: bounds.left + domElementClientRect.left,
+				width: domElementClientRect.width,
+				height: domElementClientRect.height
+			};
 
-	boundingBox.right = boundingBox.left + boundingBox.width;
-	boundingBox.bottom = boundingBox.top + boundingBox.height;
-
-	return boundingBox;
+			boundingBox.right = boundingBox.left + boundingBox.width;
+			boundingBox.bottom = boundingBox.top + boundingBox.height;
+			resolve(boundingBox);
+		});
+	}
+	return new Promise(promiseResolver);
 }
 
 /**
@@ -140,10 +144,10 @@ export default class Button extends React.Component {
 		var onMenuShown = function (shownErr, shownResponse) {
 			if (shownResponse) {
 				let finWindow = shownResponse.finWindow;
-				var onMenuBlurred = function (blurErr, blurResponse) {
+				async function onMenuBlurred(blurErr, blurResponse) {
 					//On blur, check the mouse position. If click was inside of the button, we invalidate the click event that will be coming soon.
 					let clientRect = DOM.getBoundingClientRect();
-					let boundingBox = new BoundingBoxRelativeToWindow(clientRect);
+					let boundingBox = await new BoundingBoxRelativeToWindow(clientRect);
 					//Assumption is that the blur happened elsewhere. If the blur happened on the button, we don't want to open the menu on click.
 					let openMenuOnClick = true;
 					fin.desktop.System.getMousePosition((position) => {
@@ -225,15 +229,15 @@ export default class Button extends React.Component {
 			windowName: windowName,
 			componentType: this.props.menuType
 		}, {
-			spawnIfNotFound: true,
-			data: self.props.customData
+				spawnIfNotFound: true,
+				data: self.props.customData
 
-		}, function (err, response) {
-			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.customData);
-			if (cb) {
-				return cb();
-			}
-		});
+			}, function (err, response) {
+				FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.customData);
+				if (cb) {
+					return cb();
+				}
+			});
 	}
 	componentWillMount() {
 		if (this.state.types.includes('MenuLauncher') && this.props.preSpawn) {
@@ -261,6 +265,12 @@ export default class Button extends React.Component {
 				});
 			});
 		}
+	}
+	getRandomID() {
+		var S4 = function () {
+			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+		};
+		return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
 	}
 
 	render() {
@@ -336,7 +346,9 @@ export default class Button extends React.Component {
 			if (self._onClick) self._onClick(e);
 			if (self.props.afterClick) self.props.afterClick(e);
 		};
-		return (<div onMouseUp={this.props.onMouseUp}
+		return (<div
+			id={this.props.id || this.getRandomID()}
+			onMouseUp={this.props.onMouseUp}
 			onMouseDown={this.props.onMouseDown}
 			onClick={this.onClick}
 			title={this.props.title || ''}
