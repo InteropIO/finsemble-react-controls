@@ -19,12 +19,8 @@ export default class FinsembleToolbar extends React.Component {
 
 		super(props);
 		this.props = props;
-		if (this.props.onDragEnd) {
-			this.onDragEnd = this.props.onDragEnd;
-		} else {
-			//...
-			this.onDragEnd = () => { };
-		}
+		this.onDragEnd = this.props.onDragEnd ? this.props.onDragEnd : () => {};
+		this.onDragStart = this.props.onDragStart ? this.props.onDragStart : () => {};
 	}
 
 	render() {
@@ -33,7 +29,7 @@ export default class FinsembleToolbar extends React.Component {
 
 		return (
 
-			<FinsembleDnDContext onDragEnd={this.onDragEnd}>
+			<FinsembleDnDContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
 				<div className={classes}>
 					{this.props.children}
 				</div>
