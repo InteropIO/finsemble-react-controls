@@ -340,6 +340,17 @@ export default class Button extends React.Component {
 			this.warn('No type property passed to button.');
 		}
 
+		let topDetector = null, bottomDetector = null;
+		if (this.props.dockedTop) {
+			topDetector = (
+				<div className='fsbl-hover-detector-bottom' />
+			);
+		} else if (this.props.dockedBottom) {
+			bottomDetector = (
+				<div className='fsbl-hover-detector-top' />
+			);
+		}
+
 		//Wrapper to allow for beforeClick and AfterClick
 		this.onClick = function (e) {
 			if (self.props.beforeClick) self.props.beforeClick(e);
@@ -353,9 +364,11 @@ export default class Button extends React.Component {
 			onClick={this.onClick}
 			title={this.props.title || ''}
 			className={classes}>
+			{topDetector}
 			{image}
 			{label}
 			{this.props.children}
+			{bottomDetector}
 		</div>);
 	}
 }
