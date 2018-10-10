@@ -10,6 +10,7 @@
 import React from 'react';
 import FontIcon from '../FinsembleFontIcon/FinsembleFontIcon';
 import ButtonLabel from '../FinsembleButtonLabel/FinsembleButtonLabel';
+import FinsembleHoverDetector from '../FinsembleHoverDetector/FinsembleHoverDetector';
 
 //Default to giving every button a pointer cursor.
 const styles = {
@@ -69,7 +70,8 @@ export default class Button extends React.Component {
 		}
 
 		this.state = {
-			types: types
+			types: types,
+			hoverState: false
 		};
 	}
 
@@ -83,6 +85,7 @@ export default class Button extends React.Component {
 		this.launchComponent = this.launchComponent.bind(this);
 		this.validateProps = this.validateProps.bind(this);
 		this.spawnMenu = this.spawnMenu.bind(this);
+		this.hoverAction = this.hoverAction.bind(this);
 	}
 
 	/**
@@ -273,6 +276,16 @@ export default class Button extends React.Component {
 		return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
 	}
 
+	/**
+	 * When your mouse enters/leaves the hoverDetector, this function is invoked.
+	 *
+	 * @param {any} newHoverState
+	 * @memberof LinkerButton
+	 */
+	hoverAction(newHoverState) {
+		this.setState({ hoverState: newHoverState });
+	}
+	
 	render() {
 		//If the user doesn't want to show the component, return null.
 		if (this.props.show === false) {
@@ -347,15 +360,17 @@ export default class Button extends React.Component {
 			if (self.props.afterClick) self.props.afterClick(e);
 		};
 		return (<div
+			data-hover={this.state.hoverState}	
 			id={this.props.id || this.getRandomID()}
 			onMouseUp={this.props.onMouseUp}
 			onMouseDown={this.props.onMouseDown}
 			onClick={this.onClick}
 			title={this.props.title || ''}
 			className={classes}>
-			{image}
-			{label}
-			{this.props.children}
-		</div>);
-	}
+				<FinsembleHoverDetector edge={this.props.edge} hoverAction={this.hoverAction} />
+				{image}
+				{label}
+				{this.props.children}
+			</div>);
+		}
 }
