@@ -359,6 +359,7 @@ export default class Button extends React.Component {
 			if (self._onClick) self._onClick(e);
 			if (self.props.afterClick) self.props.afterClick(e);
 		};
+		classes += " finsemble-button"; // Ensure that this class is on all manifestations of FinsembleButton
 		return (<div
 			data-hover={this.state.hoverState}	
 			id={this.props.id || this.getRandomID()}
