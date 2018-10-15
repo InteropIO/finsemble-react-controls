@@ -20,7 +20,6 @@ const styles = {
 //The specific buttonTypes we'll apply CSS classes for.
 const classMap = {
 	MenuItemLabel: 'menu-item-label',
-	MenuItemActions: 'menu-item-actions',
 	Toolbar: 'finsemble-toolbar-button',
 	Dialog: 'fsbl-button'
 };
