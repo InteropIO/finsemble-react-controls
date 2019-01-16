@@ -79,7 +79,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			let obj = {};
 			arr.forEach((el, i) => {
 				if (el) {
-					let key = el.component || el.label;
+					let key = el.component;
 					obj[key] = el;
 					obj[key].index = i;
 				}
@@ -97,14 +97,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		let orderChanged = incomingPins.some((pin, index) => {
 			let storedPin = storedPins[index], incomingPin = incomingPins[index];
 			if (storedPin && incomingPin) {
-				//Backwards compatibility. Old property was 'label'. New one is 'component'.
-				if (storedPins[index].label && incomingPins[index].label) {
-					return storedPins[index].label !== incomingPins[index].label;
-				} else {
-					return storedPins[index].component !== incomingPins[index].component;
-				}
-
-
+				return storedPins[index].component !== incomingPins[index].component;
 			}
 			return true;
 		});
