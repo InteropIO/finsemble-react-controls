@@ -173,6 +173,7 @@ export default class Button extends React.Component {
 
 		//Display the menu.
 		let windowName;
+		params.isMenu = true;
 		if (self.props.menuWindowName) {
 			windowName = self.props.menuWindowName;
 		} else {
@@ -220,20 +221,20 @@ export default class Button extends React.Component {
 	spawnMenu(cb) {
 		let self = this;
 		let windowName;
+
 		if (this.props.menuWindowName) {
 			windowName = this.props.menuWindowName;
 		} else {
 			windowName = this.props.menuType + (this.props.label ? this.props.label : this.props.tooltip ? this.props.tooltip : '');
 		}
 		const COMPONENT_UPDATE_CHANNEL = `${windowName}.ComponentsToRender`;
-
 		FSBL.Clients.LauncherClient.showWindow({
 			windowName: windowName,
 			componentType: this.props.menuType
 		}, {
 				spawnIfNotFound: true,
-				data: self.props.customData
-
+				data: self.props.customData,
+				isMenu: true
 			}, function (err, response) {
 				FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.customData);
 				if (cb) {
@@ -284,7 +285,7 @@ export default class Button extends React.Component {
 	hoverAction(newHoverState) {
 		this.setState({ hoverState: newHoverState });
 	}
-	
+
 	render() {
 		//If the user doesn't want to show the component, return null.
 		if (this.props.show === false) {
@@ -360,7 +361,7 @@ export default class Button extends React.Component {
 		};
 		classes += " finsemble-button"; // Ensure that this class is on all manifestations of FinsembleButton
 		return (<div
-			data-hover={this.state.hoverState}	
+			data-hover={this.state.hoverState}
 			id={this.props.id || this.getRandomID()}
 			onMouseUp={this.props.onMouseUp}
 			onMouseDown={this.props.onMouseDown}
