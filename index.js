@@ -19,6 +19,7 @@ import FinsembleToolbarSeparator from './FinsembleToolbarSeparator/FinsembleTool
 import FinsembleDnDContext from './FinsembleDnDContext/FinsembleDnDContext';
 import FinsembleDraggable from './FinsembleDraggable/FinsembleDraggable';
 import FinsembleDroppable from './FinsembleDroppable/FinsembleDroppable';
+import FinsembleHoverDetector from './FinsembleHoverDetector/FinsembleHoverDetector';
 export {
 	FinsembleButton,
 	FinsembleButtonLabel,
@@ -40,5 +41,6 @@ export {
 	FinsembleToolbarSeparator,
 	FinsembleDnDContext,
 	FinsembleDraggable,
-	FinsembleDroppable
+	FinsembleDroppable,
+	FinsembleHoverDetector
 };

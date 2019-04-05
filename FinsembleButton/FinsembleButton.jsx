@@ -10,6 +10,7 @@
 import React from 'react';
 import FontIcon from '../FinsembleFontIcon/FinsembleFontIcon';
 import ButtonLabel from '../FinsembleButtonLabel/FinsembleButtonLabel';
+import FinsembleHoverDetector from '../FinsembleHoverDetector/FinsembleHoverDetector';
 
 //Default to giving every button a pointer cursor.
 const styles = {
@@ -19,7 +20,6 @@ const styles = {
 //The specific buttonTypes we'll apply CSS classes for.
 const classMap = {
 	MenuItemLabel: 'menu-item-label',
-	MenuItemActions: 'menu-item-actions',
 	Toolbar: 'finsemble-toolbar-button',
 	Dialog: 'fsbl-button'
 };
@@ -30,17 +30,21 @@ const classMap = {
  * @returns
  */
 function BoundingBoxRelativeToWindow(domElementClientRect) {
-	let boundingBox = {
-		top: FSBL.Clients.WindowClient.options.defaultTop - domElementClientRect.top,
-		left: FSBL.Clients.WindowClient.options.defaultLeft + domElementClientRect.left,
-		width: domElementClientRect.width,
-		height: domElementClientRect.height
-	};
+	function promiseResolver(resolve, reject) {
+		finsembleWindow.getBounds((err, bounds) => {
+			let boundingBox = {
+				top: bounds.top - domElementClientRect.top,
+				left: bounds.left + domElementClientRect.left,
+				width: domElementClientRect.width,
+				height: domElementClientRect.height
+			};
 
-	boundingBox.right = boundingBox.left + boundingBox.width;
-	boundingBox.bottom = boundingBox.top + boundingBox.height;
-
-	return boundingBox;
+			boundingBox.right = boundingBox.left + boundingBox.width;
+			boundingBox.bottom = boundingBox.top + boundingBox.height;
+			resolve(boundingBox);
+		});
+	}
+	return new Promise(promiseResolver);
 }
 
 /**
@@ -65,7 +69,8 @@ export default class Button extends React.Component {
 		}
 
 		this.state = {
-			types: types
+			types: types,
+			hoverState: false
 		};
 	}
 
@@ -79,6 +84,7 @@ export default class Button extends React.Component {
 		this.launchComponent = this.launchComponent.bind(this);
 		this.validateProps = this.validateProps.bind(this);
 		this.spawnMenu = this.spawnMenu.bind(this);
+		this.hoverAction = this.hoverAction.bind(this);
 	}
 
 	/**
@@ -140,10 +146,10 @@ export default class Button extends React.Component {
 		var onMenuShown = function (shownErr, shownResponse) {
 			if (shownResponse) {
 				let finWindow = shownResponse.finWindow;
-				var onMenuBlurred = function (blurErr, blurResponse) {
+				async function onMenuBlurred(blurErr, blurResponse) {
 					//On blur, check the mouse position. If click was inside of the button, we invalidate the click event that will be coming soon.
 					let clientRect = DOM.getBoundingClientRect();
-					let boundingBox = new BoundingBoxRelativeToWindow(clientRect);
+					let boundingBox = await new BoundingBoxRelativeToWindow(clientRect);
 					//Assumption is that the blur happened elsewhere. If the blur happened on the button, we don't want to open the menu on click.
 					let openMenuOnClick = true;
 					fin.desktop.System.getMousePosition((position) => {
@@ -225,15 +231,15 @@ export default class Button extends React.Component {
 			windowName: windowName,
 			componentType: this.props.menuType
 		}, {
-			spawnIfNotFound: true,
-			data: self.props.customData
+				spawnIfNotFound: true,
+				data: self.props.customData
 
-		}, function (err, response) {
-			FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.customData);
-			if (cb) {
-				return cb();
-			}
-		});
+			}, function (err, response) {
+				FSBL.Clients.RouterClient.publish(COMPONENT_UPDATE_CHANNEL, self.props.customData);
+				if (cb) {
+					return cb();
+				}
+			});
 	}
 	componentWillMount() {
 		if (this.state.types.includes('MenuLauncher') && this.props.preSpawn) {
@@ -262,7 +268,23 @@ export default class Button extends React.Component {
 			});
 		}
 	}
+	getRandomID() {
+		var S4 = function () {
+			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+		};
+		return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
+	}
 
+	/**
+	 * When your mouse enters/leaves the hoverDetector, this function is invoked.
+	 *
+	 * @param {any} newHoverState
+	 * @memberof LinkerButton
+	 */
+	hoverAction(newHoverState) {
+		this.setState({ hoverState: newHoverState });
+	}
+	
 	render() {
 		//If the user doesn't want to show the component, return null.
 		if (this.props.show === false) {
@@ -336,14 +358,19 @@ export default class Button extends React.Component {
 			if (self._onClick) self._onClick(e);
 			if (self.props.afterClick) self.props.afterClick(e);
 		};
-		return (<div onMouseUp={this.props.onMouseUp}
+		classes += " finsemble-button"; // Ensure that this class is on all manifestations of FinsembleButton
+		return (<div
+			data-hover={this.state.hoverState}	
+			id={this.props.id || this.getRandomID()}
+			onMouseUp={this.props.onMouseUp}
 			onMouseDown={this.props.onMouseDown}
 			onClick={this.onClick}
 			title={this.props.title || ''}
 			className={classes}>
-			{image}
-			{label}
-			{this.props.children}
-		</div>);
-	}
+				<FinsembleHoverDetector edge={this.props.edge} hoverAction={this.hoverAction} />
+				{image}
+				{label}
+				{this.props.children}
+			</div>);
+		}
 }

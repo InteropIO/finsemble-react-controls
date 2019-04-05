@@ -1,9 +1,10 @@
 /*!
 * Copyright 2017 by ChartIQ, Inc.
 * All rights reserved.
+
+@deprecated, 10/15/18 (now just a simply div so just use a <div className="menu-item-action">)
 */
 import React from 'react';
-import FinsembleButton from '../FinsembleButton/FinsembleButton';
 
 const BUTTON_BASE_CLASS = 'menu-item-action';
 
@@ -18,8 +19,8 @@ export default class FinsembleMenuItemAction extends React.Component {
 		    //classes+=' ' + BUTTON_BASE_CLASS;
 			classes +=  ` ${BUTTON_BASE_CLASS}`;
 		}
-		return (<FinsembleButton {...this.props} className={classes}>
+		return (<div {...this.props} className={classes}>
 			{this.props.children}
-		</FinsembleButton>);
+		</div>);
 	}
 }
