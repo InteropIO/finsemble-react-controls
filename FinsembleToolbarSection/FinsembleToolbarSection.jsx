@@ -79,7 +79,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			let obj = {};
 			arr.forEach((el, i) => {
 				if (el) {
-					let key = el.label;
+					let key = el.component;
 					obj[key] = el;
 					obj[key].index = i;
 				}
@@ -97,7 +97,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		let orderChanged = incomingPins.some((pin, index) => {
 			let storedPin = storedPins[index], incomingPin = incomingPins[index];
 			if (storedPin && incomingPin) {
-				return storedPins[index].label !== incomingPins[index].label;
+				return storedPins[index].component !== incomingPins[index].component;
 			}
 			return true;
 		});
@@ -276,7 +276,7 @@ export default class FinsembleToolbarSection extends React.Component {
 
 	mouseInWindow(mp) {
 		let border = 3;
-		if (mp.x >= (this.windowBounds.left+border) && mp.x <= (this.windowBounds.right-border) && mp.y >= (this.windowBounds.top+border) && mp.y <= (this.windowBounds.bottom-border)) {
+		if (mp.x >= (this.windowBounds.left + border) && mp.x <= (this.windowBounds.right - border) && mp.y >= (this.windowBounds.top + border) && mp.y <= (this.windowBounds.bottom - border)) {
 			console.log('mouse is in window');
 			return true;
 		}
