@@ -45,6 +45,7 @@ export default class FinsembleMenuItem extends React.Component {
 
 		let actions = null,
 			label = null,
+			title = null,
 			actionItems = [];
 
 		//add the trashcan icon.
@@ -84,7 +85,8 @@ export default class FinsembleMenuItem extends React.Component {
 					onDragEnd={this.props.onDragEnd}
 					onClick={this.props.onClick || this.props.onLabelClick}
 					className="menu-item-label-fullwidth"
-					label={this.props.label} />
+					label={this.props.label} 
+					title={this.props.label} />
 			);
 		}
 
