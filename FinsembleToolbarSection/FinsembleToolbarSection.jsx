@@ -79,7 +79,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			let obj = {};
 			arr.forEach((el, i) => {
 				if (el) {
-					let key = el.component;
+					let key = el.component || el.label;
 					obj[key] = el;
 					obj[key].index = i;
 				}
@@ -97,7 +97,11 @@ export default class FinsembleToolbarSection extends React.Component {
 		let orderChanged = incomingPins.some((pin, index) => {
 			let storedPin = storedPins[index], incomingPin = incomingPins[index];
 			if (storedPin && incomingPin) {
-				return storedPins[index].component !== incomingPins[index].component;
+				// component pins have a 'component' prop which is the type of the component.
+				// workspace pins do not. They have a label. (as do the components...but component
+				// labels can change. workspace labels cannot).
+				const pinKey = storedPin.component ? "component" : "label";
+				return storedPins[index][pinKey] !== incomingPins[index][pinKey];
 			}
 			return true;
 		});
@@ -447,12 +451,12 @@ export default class FinsembleToolbarSection extends React.Component {
 			let cmp;
 
 			switch (pin.type) {
-			case 'componentLauncher':
-				cmp = <Component key={i} iconClasses="pinned-icon" buttonType={['AppLauncher', 'Toolbar']} {...pin} />;
-				break;
-			default:
-				cmp = <Component key={i} {...pin} />;
-				break;
+				case 'componentLauncher':
+					cmp = <Component key={i} iconClasses="pinned-icon" buttonType={['AppLauncher', 'Toolbar']} {...pin} />;
+					break;
+				default:
+					cmp = <Component key={i} {...pin} />;
+					break;
 			}
 
 			if (this.props.arrangeable) {
