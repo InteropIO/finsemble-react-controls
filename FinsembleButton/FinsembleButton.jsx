@@ -123,7 +123,6 @@ export default class Button extends React.Component {
 		//If the click action has been invalidated (because the user clicked the menu Launcher while the menu was open), we allow subsequent clicks to open the menu.
 		if (!this.openMenuOnClick) {
 			this.openMenuOnClick = true;
-			return;
 		}
 		let self = this;
 		//Params for the dialogManager.
