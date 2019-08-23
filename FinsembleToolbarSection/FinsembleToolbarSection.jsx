@@ -203,6 +203,7 @@ export default class FinsembleToolbarSection extends React.Component {
      * @memberof FinsembleToolbarSection
      */
 	saveButtonsToOverflowStore(e, self) {
+		if (!self.state.overflowStore || !self.state.overflowStore.setValue) return;
 		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.state.clickChannel });
 		function makeButtonsSafeForRouter(overflow) {
 			return overflow.map((el) => {
@@ -275,6 +276,8 @@ export default class FinsembleToolbarSection extends React.Component {
 			self.setState({
 				overflow: overflow,
 				minOverflowIndex: (overflow[0] ? overflow[0].index : minOverflowIndex)
+			}, () => {
+				self.saveButtonsToOverflowStore(null, self);
 			});
 		}
 	}
@@ -539,6 +542,8 @@ export default class FinsembleToolbarSection extends React.Component {
 					self.initialLoad = true;
 				});
 				store.addListener({ field: 'pins' }, self.processPins);
+			}, () => {
+				self.saveButtonsToOverflowStore(null, self);
 			});
 		}
 
