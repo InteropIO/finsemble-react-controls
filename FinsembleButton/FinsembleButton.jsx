@@ -58,7 +58,7 @@ export default class Button extends React.Component {
 		super(props);
 		//Necessary to bind the correct _this_ to methods on the class.
 		this.bindCorrectContext();
-		this.finWindow = fin.desktop.Window.getCurrent();
+		this.finWindow = FEA.desktop.Window.getCurrent();
 		//Used by menuLaunchers. see `this.launchMenu` for more.
 
 		this.openMenuOnClick = true;
@@ -130,7 +130,7 @@ export default class Button extends React.Component {
 		let params = {
 			monitor: 'mine',
 			position: 'relative',
-			left: e.currentTarget.getBoundingClientRect().left,
+			left: e.currentTarget.getBoundingClientRect().left -(this.props.marginLeft||0),
 			forceOntoMonitor: true,
 			top: 'adjacent',
 			spawnIfNotFound: true
@@ -149,10 +149,11 @@ export default class Button extends React.Component {
 				async function onMenuBlurred(blurErr, blurResponse) {
 					//On blur, check the mouse position. If click was inside of the button, we invalidate the click event that will be coming soon.
 					let clientRect = DOM.getBoundingClientRect();
+					
 					let boundingBox = await new BoundingBoxRelativeToWindow(clientRect);
 					//Assumption is that the blur happened elsewhere. If the blur happened on the button, we don't want to open the menu on click.
 					let openMenuOnClick = true;
-					fin.desktop.System.getMousePosition((position) => {
+					FEA.desktop.System.getMousePosition((position) => {
 						//If the click was inside of the opening button's bounding rectangle, don't hide.
 						if (position.left > boundingBox.left && position.left < boundingBox.right && position.top < boundingBox.bottom && position.top > boundingBox.top) {
 							openMenuOnClick = false;
@@ -247,12 +248,12 @@ export default class Button extends React.Component {
 			FSBL.Clients.DistributedStoreClient.createStore({
 				store: 'Finsemble-Menu-Store',
 				global: true,
-				values: { creator: fin.desktop.Window.getCurrent().name }
+				values: { creator: FEA.desktop.Window.getCurrent().name }
 			}, function (err, store) {
 				self.store = store;
 				store.getValues(function (err, data) {
 					if (err) return console.error(err);
-					let isCreator = data.creator === fin.desktop.Window.getCurrent().name;
+					let isCreator = data.creator === FEA.desktop.Window.getCurrent().name;
 					if (!isCreator) return;
 					//If this button didn't create the store don't do anything
 					if (!data || !data[self.props.menuType]) {// If the menu doesn't exist yet spawn it.
