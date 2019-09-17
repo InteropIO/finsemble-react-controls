@@ -296,6 +296,7 @@ export default class Button extends React.Component {
 		//Some intitial setup/defaults setting.
 		let self = this,
 			image = null,
+			fontIcon = null,
 			label = null,
 			iconPosition = this.props.iconPosition || 'left',
 			iconClasses = this.props.iconClasses || '',
@@ -317,7 +318,7 @@ export default class Button extends React.Component {
 			if (types.includes('Toolbar')) {
 				iconClasses += ' finsemble-toolbar-button-icon';
 			}
-			image = (<FontIcon className={iconClasses} icon={this.props.fontIcon} />);
+			fontIcon = (<FontIcon className={iconClasses} icon={this.props.fontIcon} />);
 		}
 
 		//Render label.
@@ -358,7 +359,6 @@ export default class Button extends React.Component {
 			if (self._onClick) self._onClick(e);
 			if (self.props.afterClick) self.props.afterClick(e);
 		};
-		classes += " finsemble-button"; // Ensure that this class is on all manifestations of FinsembleButton
 		return (<div
 			data-hover={this.state.hoverState}	
 			id={this.props.id || this.getRandomID()}
@@ -369,6 +369,7 @@ export default class Button extends React.Component {
 			className={classes}>
 				<FinsembleHoverDetector edge={this.props.edge} hoverAction={this.hoverAction} />
 				{image}
+				{fontIcon}
 				{label}
 				{this.props.children}
 			</div>);

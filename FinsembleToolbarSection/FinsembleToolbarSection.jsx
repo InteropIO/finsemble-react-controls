@@ -508,8 +508,8 @@ export default class FinsembleToolbarSection extends React.Component {
 				this.state.overflowMenuProps = {
 					buttonType: ['Toolbar', 'MenuLauncher'],
 					menuType: 'Overflow Menu',
-					title: 'Overflow',
-					fontIcon: 'ff-caret-down',
+					title: 'More...',
+					fontIcon: 'ff-chevron-down',
 					preSpawn: true
 				};
 			}
