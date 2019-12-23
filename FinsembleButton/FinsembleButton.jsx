@@ -161,9 +161,9 @@ export default class Button extends React.Component {
 						self.openMenuOnClick = openMenuOnClick;
 						console.log('LaunchMenu Post Blur', self.openMenuOnClick, boundingBox, position);
 					});
-					finWindow.removeEventListener('blurred', onMenuBlurred);
+					finWindow.removeEventListener('hidden', onMenuBlurred);
 				};
-				finWindow.addEventListener('blurred', onMenuBlurred);
+				finWindow.addEventListener('hidden', onMenuBlurred);
 
 				//Our appLauncher is listening on this channel for items to populate it.
 				//@todo move this into the AppLauncherButton code.
