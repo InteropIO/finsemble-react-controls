@@ -139,7 +139,7 @@ export default class Button extends React.Component {
 		let DOM = e.target.parentElement;
 
 		/**
-		 * When the menu is shown, we add a blur event handler. This allows us to figure out if the user is trying to close the menu by clicking the button a 2nd time, or if they're trying to open the menu on the first click.
+		 * When the menu is shown, we add a hidden event handler. This allows us to figure out if the user is trying to close the menu by clicking the button a 2nd time, or if they're trying to open the menu on the first click.
 		 * @param {*} shownErr
 		 * @param {*} shownResponse
 		 */
@@ -163,6 +163,7 @@ export default class Button extends React.Component {
 					});
 					finWindow.removeEventListener('hidden', onMenuBlurred);
 				};
+				
 				finWindow.addEventListener('hidden', onMenuBlurred);
 
 				//Our appLauncher is listening on this channel for items to populate it.
