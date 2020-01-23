@@ -94,14 +94,14 @@ export default class FinsembleToolbarSection extends React.Component {
 			incomingPins = pinsToArray(data.value);
 		}
 		//Just lets us know if any of them have changed.
-		let orderChanged = incomingPins.some((pin, index) => {
+		let orderOrLabelsChanged = incomingPins.some((pin, index) => {
 			let storedPin = storedPins[index], incomingPin = incomingPins[index];
 			if (storedPin && incomingPin) {
 				// component pins have a 'component' prop which is the type of the component.
 				// workspace pins do not. They have a label. (as do the components...but component
 				// labels can change. workspace labels cannot).
-				const pinKey = storedPin.component ? "component" : "label";
-				return storedPins[index][pinKey] !== incomingPins[index][pinKey];
+				const pinKey = storedPin.component ? 'component' : 'label';
+				return (storedPins[index][pinKey] !== incomingPins[index][pinKey]) || storedPin.label !== incomingPin.label;
 			}
 			return true;
 		});
@@ -109,7 +109,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		//Either a pin was added or removed.
 		if (incomingPins.length !== storedPins.length) {
 			pinsChanged = true;
-		} else if (orderChanged) {
+		} else if (orderOrLabelsChanged) {
 			pinsChanged = true;
 		}
 		// If pins have changed, rerender
@@ -455,12 +455,12 @@ export default class FinsembleToolbarSection extends React.Component {
 			let cmp;
 
 			switch (pin.type) {
-				case 'componentLauncher':
-					cmp = <Component key={i} iconClasses="pinned-icon" buttonType={['AppLauncher', 'Toolbar']} {...pin} />;
-					break;
-				default:
-					cmp = <Component key={i} {...pin} />;
-					break;
+			case 'componentLauncher':
+				cmp = <Component key={i} iconClasses="pinned-icon" buttonType={['AppLauncher', 'Toolbar']} {...pin} />;
+				break;
+			default:
+				cmp = <Component key={i} {...pin} />;
+				break;
 			}
 
 			if (this.props.arrangeable) {
@@ -508,8 +508,8 @@ export default class FinsembleToolbarSection extends React.Component {
 				this.state.overflowMenuProps = {
 					buttonType: ['Toolbar', 'MenuLauncher'],
 					menuType: 'Overflow Menu',
-					title: 'Overflow',
-					fontIcon: 'ff-caret-down',
+					title: 'More...',
+					fontIcon: 'ff-chevron-down',
 					preSpawn: true
 				};
 			}

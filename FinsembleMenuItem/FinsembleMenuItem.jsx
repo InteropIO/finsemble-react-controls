@@ -45,12 +45,13 @@ export default class FinsembleMenuItem extends React.Component {
 
 		let actions = null,
 			label = null,
+			title = null,
 			actionItems = [];
 
 		//add the trashcan icon.
 		if (this.props.isDeletable) {
 			this.validateProp('deleteAction');
-			actionItems.push(<div key="delete" className="menu-item-action" onClick={this.props.deleteAction}><FontIcon icon='ff-delete' /></div>);
+			actionItems.push(<div title="Delete" key="delete" className="menu-item-action" onClick={this.props.deleteAction}><FontIcon icon='ff-adp-trash-outline' /></div>);
 		}
 
 		//add the pin icon.
@@ -60,7 +61,7 @@ export default class FinsembleMenuItem extends React.Component {
 			let pinIconClass = this.props.pinIcon || 'ff-pin';
 			let activePinClass = this.props.activePinModifier || 'finsemble-item-pinned';
 			let pinIcon = this.props.isPinned ? `${pinIconClass} ${activePinClass}` : pinIconClass;
-			actionItems.push(<div key="pin" className="menu-item-action" onClick={this.props.pinAction}><FontIcon icon={pinIcon} /></div>);
+			actionItems.push(<div key="pin" className="menu-item-action" title={this.props.isPinned ? "Unfavorite" : "Favorite"} onClick={this.props.pinAction}><FontIcon icon={pinIcon} /></div>);
 		}
 
 
@@ -84,7 +85,8 @@ export default class FinsembleMenuItem extends React.Component {
 					onDragEnd={this.props.onDragEnd}
 					onClick={this.props.onClick || this.props.onLabelClick}
 					className="menu-item-label-fullwidth"
-					label={this.props.label} />
+					label={this.props.label} 
+					title={this.props.label} />
 			);
 		}
 
