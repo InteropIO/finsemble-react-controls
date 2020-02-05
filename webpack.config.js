@@ -4,7 +4,7 @@ module.exports = {
 	stats: {
 		warnings: true
 	},
-	watch: false,
+	watch: process.env.NODE_ENV === 'development',
 	module: {
 		rules: [
 			{
