@@ -459,6 +459,7 @@ export default class FinsembleToolbarSection extends React.Component {
 				components.push(
 					//Wrap the component with a FinsembleDraggable.
 					<div
+						key={i}
 						draggable={true}
 						onDragStart={(e) => {
 							this.onDragStart(e, pin);
@@ -475,8 +476,7 @@ export default class FinsembleToolbarSection extends React.Component {
 						onDragOver={(e) => {
 							this.onDragOver(e, pin);
 						}}
-						className="fullHeightFlex"
-						key={i}>
+						className="fullHeightFlex">
 						{cmp}
 					</div>);
 			} else {
