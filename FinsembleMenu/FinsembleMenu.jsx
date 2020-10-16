@@ -30,7 +30,7 @@ export default class FinsembleMenu extends React.Component {
 	//Sets up the menu, adding listeners and necessary CSS Classes.
 	constructor(props) {
 		super(props);
-		this.finWindow = FEA.desktop.Window.getCurrent();
+		this.finWindow = fin.desktop.Window.getCurrent();
 		this.state = {
 			bounds: {
 				height: 2000

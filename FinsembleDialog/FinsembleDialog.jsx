@@ -10,7 +10,7 @@ export default class FinsembleDialog extends React.Component {
 		super(props);
 		this.props = props;
 
-		this.finWindow = FEA.desktop.Window.getCurrent();
+		this.finWindow = fin.desktop.Window.getCurrent();
 		this.finWindow.updateOptions({
 			alwaysOnTop: true
 		});

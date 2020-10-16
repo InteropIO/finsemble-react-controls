@@ -79,7 +79,7 @@ export default class FinsembleToolbarSection extends React.Component {
 			let obj = {};
 			arr.forEach((el, i) => {
 				if (el) {
-					let key = el.component;
+					let key = el.component || el.label;
 					obj[key] = el;
 					obj[key].index = i;
 				}
@@ -94,10 +94,14 @@ export default class FinsembleToolbarSection extends React.Component {
 			incomingPins = pinsToArray(data.value);
 		}
 		//Just lets us know if any of them have changed.
-		let orderChanged = incomingPins.some((pin, index) => {
+		let orderOrLabelsChanged = incomingPins.some((pin, index) => {
 			let storedPin = storedPins[index], incomingPin = incomingPins[index];
 			if (storedPin && incomingPin) {
-				return storedPins[index].component !== incomingPins[index].component;
+				// component pins have a 'component' prop which is the type of the component.
+				// workspace pins do not. They have a label. (as do the components...but component
+				// labels can change. workspace labels cannot).
+				const pinKey = storedPin.component ? 'component' : 'label';
+				return (storedPins[index][pinKey] !== incomingPins[index][pinKey]) || storedPin.label !== incomingPin.label;
 			}
 			return true;
 		});
@@ -105,7 +109,7 @@ export default class FinsembleToolbarSection extends React.Component {
 		//Either a pin was added or removed.
 		if (incomingPins.length !== storedPins.length) {
 			pinsChanged = true;
-		} else if (orderChanged) {
+		} else if (orderOrLabelsChanged) {
 			pinsChanged = true;
 		}
 		// If pins have changed, rerender
@@ -138,6 +142,7 @@ export default class FinsembleToolbarSection extends React.Component {
 	 * @param {*} e
 	 */
 	handleResize(e) {
+		this.saveButtonsToOverflowStore(e, this);
 		this.setState({ minOverflowIndex: DEFAULT_MINIMUM_OVERFLOW, overflow: [] });
 	}
 
@@ -198,6 +203,7 @@ export default class FinsembleToolbarSection extends React.Component {
      * @memberof FinsembleToolbarSection
      */
 	saveButtonsToOverflowStore(e, self) {
+		if (!self.state.overflowStore || !self.state.overflowStore.setValue) return;
 		self.state.overflowStore.setValue({ field: 'clickChannel', value: self.state.clickChannel });
 		function makeButtonsSafeForRouter(overflow) {
 			return overflow.map((el) => {
@@ -270,6 +276,8 @@ export default class FinsembleToolbarSection extends React.Component {
 			self.setState({
 				overflow: overflow,
 				minOverflowIndex: (overflow[0] ? overflow[0].index : minOverflowIndex)
+			}, () => {
+				self.saveButtonsToOverflowStore(null, self);
 			});
 		}
 	}
@@ -500,8 +508,8 @@ export default class FinsembleToolbarSection extends React.Component {
 				this.state.overflowMenuProps = {
 					buttonType: ['Toolbar', 'MenuLauncher'],
 					menuType: 'Overflow Menu',
-					title: 'Overflow',
-					fontIcon: 'ff-caret-down',
+					title: 'More...',
+					fontIcon: 'ff-chevron-down',
 					preSpawn: true
 				};
 			}
@@ -534,6 +542,8 @@ export default class FinsembleToolbarSection extends React.Component {
 					self.initialLoad = true;
 				});
 				store.addListener({ field: 'pins' }, self.processPins);
+			}, () => {
+				self.saveButtonsToOverflowStore(null, self);
 			});
 		}
 
@@ -568,7 +578,7 @@ export default class FinsembleToolbarSection extends React.Component {
 					var comps = [];
 					// render the overflow component
 					if (index == self.state.minOverflowIndex) {
-						comps.push(<OverflowComponent beforeClick={function (e) { self.saveButtonsToOverflowStore(e, self); }} {...self.state.overflowMenuProps} key={'overflow' + index} />);
+						comps.push(<OverflowComponent {...self.state.overflowMenuProps} key={'overflow' + index} />);
 					}
 					// render the rest of the components hidden
 					comps.push(<div key={index} style={{ display: 'none' }}>{item}</div>);
