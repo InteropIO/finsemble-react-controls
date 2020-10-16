@@ -91,7 +91,6 @@ export default class FinsembleOverflowMenu extends React.Component {
 	onClick(e, buttonIndex) {
 		//The props of the MenuItem itself are passed to the Label as menuItemProps.
 		FSBL.Clients.RouterClient.transmit(this.state.clickChannel, { index: buttonIndex });
-		FSBL.Clients.WindowClient.finsembleWindow.hide();
 	}
 
 	componentWillMount() {
