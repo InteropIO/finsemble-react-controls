@@ -28,7 +28,7 @@ export default class FinsembleMenuSection extends React.Component {
 		};
 		this.wrapperReference = null;
 		this.bindCorrectContext();
-		this.finWindow = fin.desktop.Window.getCurrent();
+		this.finWindow = FEA.desktop.Window.getCurrent();
 		this.finWindow.addEventListener('shown', this.onWindowShown);
 	}
 
